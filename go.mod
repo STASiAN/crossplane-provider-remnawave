@@ -1,4 +1,4 @@
-module github.com/crossplane/upjet-provider-template
+module github.com/STASiAN/crossplane-provider-remnawave
 
 go 1.26.5
 

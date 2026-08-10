@@ -1,0 +1,13 @@
+apiVersion: remnawave.crossplane.io/v1alpha1
+kind: BillingHistory
+metadata:
+  annotations:
+    meta.upbound.io/example-id: remnawave/v1alpha1/billinghistory
+  labels:
+    testing.upbound.io/example-name: payment
+  name: payment
+spec:
+  forProvider:
+    amount: 9.99
+    billedAt: "2026-01-15T12:00:00.000Z"
+    providerUuid: ${remnawave_infra_provider.example.uuid}

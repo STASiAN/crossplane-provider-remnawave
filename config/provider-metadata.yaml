@@ -1,40 +1,771 @@
-name: hashicorp/null
+name: batonogov/remnawave
 resources:
-    null_resource:
+    remnawave_api_token:
         subCategory: ""
-        description: The null_resource resource implements the standard resource lifecycle but takes no further action. On Terraform 1.4 and later, use the terraform_data resource type https://developer.hashicorp.com/terraform/language/resources/terraform-data instead. Terraform 1.9 and later support the moved configuration block from null_resource to terraform_data. The triggers argument allows specifying an arbitrary set of values that, when changed, will cause the resource to be replaced.
-        name: null_resource
-        title: null_resource Resource - terraform-provider-null
+        description: 'Manages a Remnawave API token. Note: requires admin JWT auth (not API token). Token value only returned on create. Import supports compound ID'
+        name: remnawave_api_token
+        title: remnawave_api_token Resource - terraform-provider-remnawave
         examples:
-            - name: cluster
+            - name: ci
               manifest: |-
                 {
-                  "connection": [
-                    {
-                      "host": "${element(aws_instance.cluster[*].public_ip, 0)}"
-                    }
-                  ],
-                  "provisioner": {
-                    "remote-exec": [
-                      {
-                        "inline": [
-                          "bootstrap-cluster.sh ${join(\" \",\n      aws_instance.cluster[*].private_ip)}"
-                        ]
-                      }
-                    ]
-                  },
-                  "triggers": {
-                    "cluster_instance_ids": "${join(\",\", aws_instance.cluster[*].id)}"
-                  }
+                  "expires_in_days": 30,
+                  "name": "ci-deploy",
+                  "scopes": [
+                    "*"
+                  ]
                 }
+        argumentDocs:
+            expire_at: (String) Token expiration timestamp returned by Remnawave.
+            expires_in_days: (Number) Token expiration in days. On import, can be derived from createdAt/expireAt or provided via compound import ID <uuid>,<expires_in_days>.
+            name: (String) Token name (2-30 chars).
+            scopes: '(Set of String) Token scopes (default: [''*'']).'
+            token: (String, Sensitive) JWT token value (only available on create).
+            uuid: (String) Token UUID.
+        importStatements:
+            - |-
+              # Import by token UUID. Adding expires_in_days is recommended for Remnawave 2.7.x.
+              terraform import remnawave_api_token.ci 00000000-0000-0000-0000-000000000000,30
+    remnawave_billing_history:
+        subCategory: ""
+        description: Manages a Remnawave infra billing history record. Records cannot be updated — only created and deleted.
+        name: remnawave_billing_history
+        title: remnawave_billing_history Resource - terraform-provider-remnawave
+        examples:
+            - name: payment
+              manifest: |-
+                {
+                  "amount": 9.99,
+                  "billed_at": "2026-01-15T12:00:00.000Z",
+                  "provider_uuid": "${remnawave_infra_provider.example.uuid}"
+                }
+              references:
+                provider_uuid: remnawave_infra_provider.example.uuid
+        argumentDocs:
+            amount: (Number) Billing amount.
+            billed_at: (String) Billing date (ISO 8601 datetime).
+            provider_uuid: (String) UUID of the infra provider.
+            uuid: (String)
+        importStatements:
+            - |-
+              # Import a billing history record by UUID.
+              terraform import remnawave_billing_history.payment 00000000-0000-0000-0000-000000000000
+    remnawave_billing_node:
+        subCategory: ""
+        description: Manages a Remnawave infra billing node.
+        name: remnawave_billing_node
+        title: remnawave_billing_node Resource - terraform-provider-remnawave
+        examples:
+            - name: example
+              manifest: |-
+                {
+                  "next_billing_at": "2027-01-01T00:00:00.000Z",
+                  "provider_uuid": "${remnawave_infra_provider.example.uuid}"
+                }
+              references:
+                provider_uuid: remnawave_infra_provider.example.uuid
               dependencies:
-                aws_instance.cluster: |-
+                remnawave_infra_provider.example: |-
                     {
-                      "ami": "ami-0dcc1e21636832c5d",
-                      "count": 3,
-                      "instance_type": "m5.large"
+                      "name": "Provider Co"
                     }
         argumentDocs:
-            id: (String) This is set to a random value at create time.
-            triggers: (Map of String) A map of arbitrary strings that, when changed, will force the null resource to be replaced, re-running any associated provisioners.
+            name: (String) Optional display name.
+            next_billing_at: (String) Next billing date (ISO 8601 datetime).
+            node_uuid: (String) UUID of the associated node (optional).
+            provider_uuid: (String) UUID of the infra provider.
+            uuid: (String)
+        importStatements:
+            - |-
+              # Import a billing node by UUID.
+              terraform import remnawave_billing_node.example 00000000-0000-0000-0000-000000000000
+    remnawave_config_profile:
+        subCategory: ""
+        description: Manages a Remnawave config profile (Xray configuration template).
+        name: remnawave_config_profile
+        title: remnawave_config_profile Resource - terraform-provider-remnawave
+        examples:
+            - name: default
+              manifest: |-
+                {
+                  "config": "${jsonencode({\n    inbounds = [{\n      tag      = \"vless-in\"\n      listen   = \"0.0.0.0\"\n      port     = 443\n      protocol = \"vless\"\n      settings = {\n        decryption = \"none\"\n        clients    = []\n      }\n      streamSettings = {\n        network  = \"tcp\"\n        security = \"tls\"\n      }\n    }]\n    routing = { rules = [] }\n  })}",
+                  "name": "default-profile"
+                }
+        argumentDocs:
+            config: (String, Sensitive) Xray configuration as JSON string. Opaque to the provider — the panel manages the structure.
+            country_code: (String)
+            inbounds: (Attributes List) Inbounds parsed by Remnawave from the Xray config. Their UUIDs are used by nodes, hosts, and squads. (see below for nested schema)
+            name: (String) Profile name (2-30 chars, letters/numbers/underscores/dashes/spaces).
+            network: (String)
+            nodes: (Attributes List) Nodes currently assigned to this config profile. (see below for nested schema)
+            port: (Number)
+            profile_uuid: (String)
+            raw_inbound: (String, Sensitive) Raw inbound as normalized JSON.
+            security: (String)
+            tag: (String)
+            type: (String)
+            uuid: (String) UUID of the config profile.
+        importStatements:
+            - |-
+              # Import a config profile by UUID.
+              terraform import remnawave_config_profile.default 00000000-0000-0000-0000-000000000000
+    remnawave_drop_connections:
+        subCategory: ""
+        description: 'Drops active connections for users or IP addresses via the version-appropriate Remnawave connections API. Supports targeting all nodes or specific nodes. This is an imperative action resource: applying it sends a drop-connections request to the panel. Use the optional triggers map to force re-execution when its values change.'
+        name: remnawave_drop_connections
+        title: remnawave_drop_connections Resource - terraform-provider-remnawave
+        examples:
+            - name: stale
+              manifest: |-
+                {
+                  "drop_by": "user_uuids",
+                  "triggers": {
+                    "timestamp": "${timestamp()}"
+                  },
+                  "user_uuids": [
+                    "${remnawave_user.example.uuid}"
+                  ]
+                }
+              references:
+                user_uuids: remnawave_user.example.uuid
+        argumentDocs:
+            drop_by: '(String) Drop mode: either user_uuids or ip_addresses. When user_uuids, provide user_uuids list. When ip_addresses, provide ip_addresses list.'
+            event_sent: (Boolean) Whether the drop-connections event was sent successfully.
+            id: (String) Stable identifier derived from input values and triggers.
+            ip_addresses: (List of String) List of IP addresses to drop connections for. Required when drop_by = ip_addresses.
+            node_uuids: (List of String) List of node UUIDs to target. Required when target = specific_nodes.
+            target: '(String) Node targeting: all_nodes (default) or specific_nodes. When specific_nodes, provide node_uuids list.'
+            triggers: (Map of String) A map of arbitrary string values. When any value changes, the resource is replaced and the drop-connections action is re-executed.
+            user_uuids: '(List of String) List of user identifiers to drop connections for: UUIDs on Remnawave 2.x, numeric IDs encoded as strings on 3.0+. Required when drop_by = user_uuids.'
         importStatements: []
+    remnawave_external_squad:
+        subCategory: ""
+        description: Manages a Remnawave external squad.
+        name: remnawave_external_squad
+        title: remnawave_external_squad Resource - terraform-provider-remnawave
+        examples:
+            - name: standard
+              manifest: |-
+                {
+                  "name": "Standard",
+                  "response_headers_add": "${jsonencode({\n    X-Squad = \"standard\"\n  })}",
+                  "response_headers_remove": "${jsonencode([\n    \"X-Legacy-Header\",\n  ])}"
+                }
+        argumentDocs:
+            custom_remarks: (String) Squad custom remarks as JSON.
+            host_overrides: (String) Squad host overrides as JSON.
+            hwid_settings: (String) Squad HWID settings as JSON.
+            name: (String) Squad name (2-30 chars).
+            response_headers: (String) Squad response headers as a JSON object on Remnawave 2.x. Header names are treated case-insensitively. Retained as a no-op in state on 3.0+; use response_headers_add and response_headers_remove instead.
+            response_headers_add: (String) Headers to add to subscription responses, as a JSON object on Remnawave 3.0+. Header names are treated case-insensitively. Retained as a no-op in state on 2.x.
+            response_headers_remove: (String) JSON array of header names to remove from subscription responses on Remnawave 3.0+. Header names are treated case-insensitively. Retained as a no-op in state on 2.x.
+            subpage_config_uuid: (String) Subscription page config UUID assigned to the squad.
+            subscription_settings: (String) Squad-specific subscription settings as JSON.
+            templates: (String) Template assignments as JSON array.
+            uuid: (String)
+        importStatements:
+            - |-
+              # Import an external squad by UUID.
+              terraform import remnawave_external_squad.standard 00000000-0000-0000-0000-000000000000
+    remnawave_host:
+        subCategory: ""
+        description: Manages a Remnawave host (connection endpoint for VPN users).
+        name: remnawave_host
+        title: remnawave_host Resource - terraform-provider-remnawave
+        examples:
+            - name: vless
+              manifest: "{\n  \"address\": \"vpn.example.com\",\n  \"config_profile_inbound_uuid\": \"${remnawave_config_profile.default.inbounds[0].uuid}\",\n  \"config_profile_uuid\": \"${remnawave_config_profile.default.uuid}\",\n  \"port\": 443,\n  \"remark\": \"\U0001F1E9\U0001F1EA Frankfurt\",\n  \"tags\": [\n    \"EU\",\n    \"PREMIUM\"\n  ]\n}"
+              references:
+                config_profile_inbound_uuid: remnawave_config_profile.default.inbounds[0].uuid
+                config_profile_uuid: remnawave_config_profile.default.uuid
+        argumentDocs:
+            address: (String) Server address (IP or hostname).
+            alpn: (String) ALPN value (h3, h2, http/1.1, or combinations).
+            config_profile_inbound_uuid: (String) UUID of the inbound within the config profile.
+            config_profile_uuid: (String) UUID of the config profile this host belongs to.
+            exclude_from_subscription_types: (Set of String) Subscription template types from which this host is excluded.
+            excluded_internal_squads: (List of String) Internal squad UUIDs from which this host is excluded.
+            final_mask: (String) Final mask configuration as JSON.
+            fingerprint: (String) TLS fingerprint (e.g. chrome, firefox).
+            host_header: (String) Host header for HTTP/WebSocket.
+            is_disabled: (Boolean) Whether the host is disabled.
+            is_hidden: (Boolean) Hide host from subscription.
+            keep_sni_blank: (Boolean) Keep SNI blank instead of deriving it.
+            mihomo_ip_version: (String) Mihomo IP version preference.
+            mihomo_x25519: (Boolean) Enable Mihomo X25519 proxy.
+            mux_params: (String) Mux parameters as JSON.
+            nodes: (List of String) List of node UUIDs associated with this host.
+            override_sni_from_address: (Boolean) Derive SNI from the host address.
+            path: (String) WebSocket path or HTTP path.
+            pinned_peer_cert_sha256: (String) Pinned peer certificate SHA-256 value.
+            port: (Number) Server port.
+            remark: (String) Display name for the host (max 40 chars).
+            security_layer: '(String) Security layer: DEFAULT, TLS, or NONE.'
+            server_description: (String) Short server description (max 30 chars).
+            shuffle_host: (Boolean) Shuffle host order in subscription.
+            sni: (String) TLS Server Name Indication.
+            sockopt_params: (String) Socket options as JSON.
+            tags: (List of String) List of tags (uppercase letters/numbers/underscores/colons, max 36 chars each). Remnawave 2.7.x supports at most one tag; 2.8.x supports up to 10 tags.
+            uuid: (String) UUID of the host (assigned by the panel).
+            verify_peer_cert_by_name: (String) Peer certificate name to verify.
+            vless_route_id: (Number) VLESS route ID (0-65535).
+            xhttp_extra_params: (String) XHTTP extra parameters as JSON.
+            xray_json_template_uuid: (String) Xray JSON subscription template UUID.
+        importStatements:
+            - |-
+              # Import a host by UUID.
+              terraform import remnawave_host.vless 00000000-0000-0000-0000-000000000000
+    remnawave_host_bulk_action:
+        subCategory: ""
+        description: 'Performs a bulk operation (enable, disable, or delete) on one or more hosts. This is an imperative resource: the action runs when the resource is created and whenever its arguments change; an apply with no changes does not repeat it. Change triggers to force re-execution without changing the operation inputs.'
+        name: remnawave_host_bulk_action
+        title: remnawave_host_bulk_action Resource - terraform-provider-remnawave
+        examples:
+            - name: disable_maintenance
+              manifest: |-
+                {
+                  "action": "disable",
+                  "triggers": {
+                    "reason": "scheduled-maintenance-2024-01-15"
+                  },
+                  "uuids": [
+                    "550e8400-e29b-41d4-a716-446655440000",
+                    "550e8400-e29b-41d4-a716-446655440001"
+                  ]
+                }
+        argumentDocs:
+            action: '(String) Bulk action to perform. One of: enable, disable, delete.'
+            id: (String) Opaque identifier for this bulk action resource instance.
+            triggers: (Map of String) A map of arbitrary key/value pairs. When any value changes, the resource is re-applied and the action re-executed.
+            uuids: (List of String) List of host UUIDs to operate on.
+        importStatements: []
+    remnawave_hwid_device:
+        subCategory: ""
+        description: Manages a Remnawave HWID device entry for a user.
+        name: remnawave_hwid_device
+        title: remnawave_hwid_device Resource - terraform-provider-remnawave
+        examples:
+            - name: phone
+              manifest: |-
+                {
+                  "hwid": "device-fingerprint-abc123",
+                  "user_uuid": "${remnawave_user.example.uuid}"
+                }
+              references:
+                user_uuid: remnawave_user.example.uuid
+        argumentDocs:
+            device_model: (String) Device model name.
+            hwid: (String) Hardware identifier string for the device.
+            id: (String) Unique identifier (user_uuid:hwid).
+            os_version: (String) Operating system version.
+            platform: (String) Device platform (e.g. android, ios, windows).
+            request_ip: (String) Request IP address.
+            user_agent: (String) User agent string.
+            user_uuid: '(String) Identifier of the user this device belongs to: UUID on Remnawave 2.x, numeric ID on 3.0+.'
+        importStatements:
+            - |-
+              # Remnawave 3.0+ uses <numeric_user_id>:<hwid>.
+              terraform import remnawave_hwid_device.phone 42:device-fingerprint-abc123
+
+              # Remnawave 2.x uses <user_uuid>:<hwid>.
+              terraform import remnawave_hwid_device.phone 00000000-0000-0000-0000-000000000000:device-fingerprint-abc123
+    remnawave_infra_provider:
+        subCategory: ""
+        description: Manages a Remnawave infrastructure provider (for infra billing).
+        name: remnawave_infra_provider
+        title: remnawave_infra_provider Resource - terraform-provider-remnawave
+        examples:
+            - name: example
+              manifest: |-
+                {
+                  "favicon_link": "https://example.com/favicon.ico",
+                  "login_url": "https://billing.example.com/login",
+                  "name": "Provider Co"
+                }
+        argumentDocs:
+            favicon_link: (String) Favicon URL.
+            login_url: (String) Login URL.
+            name: (String) Provider name (2-30 chars).
+            uuid: (String)
+        importStatements:
+            - |-
+              # Import an infrastructure provider by UUID.
+              terraform import remnawave_infra_provider.example 00000000-0000-0000-0000-000000000000
+    remnawave_internal_squad:
+        subCategory: ""
+        description: Manages a Remnawave internal squad (group with inbound access control).
+        name: remnawave_internal_squad
+        title: remnawave_internal_squad Resource - terraform-provider-remnawave
+        examples:
+            - name: premium
+              manifest: |-
+                {
+                  "inbounds": [
+                    "${remnawave_config_profile.default.inbounds[0].uuid}"
+                  ],
+                  "name": "Premium"
+                }
+              references:
+                inbounds: remnawave_config_profile.default.inbounds[0].uuid
+        argumentDocs:
+            accessible_nodes: (List of String) List of accessible node UUIDs derived from the squad's inbound configuration (read-only).
+            inbounds: (Set of String) Set of config profile inbound UUIDs.
+            name: (String) Squad name (2-30 chars).
+            uuid: (String)
+        importStatements:
+            - |-
+              # Import an internal squad by UUID.
+              terraform import remnawave_internal_squad.premium 00000000-0000-0000-0000-000000000000
+    remnawave_node:
+        subCategory: ""
+        description: Manages a Remnawave node (Xray server).
+        name: remnawave_node
+        title: remnawave_node Resource - terraform-provider-remnawave
+        examples:
+            - name: de_fra_01
+              manifest: |-
+                {
+                  "address": "1.2.3.4",
+                  "config_profile_inbounds": [
+                    "${remnawave_config_profile.default.inbounds[0].uuid}"
+                  ],
+                  "config_profile_uuid": "${remnawave_config_profile.default.uuid}",
+                  "name": "de-fra-01",
+                  "port": 443
+                }
+              references:
+                config_profile_inbounds: remnawave_config_profile.default.inbounds[0].uuid
+                config_profile_uuid: remnawave_config_profile.default.uuid
+        argumentDocs:
+            active_plugin_uuid: (String) Active node plugin UUID.
+            address: (String) Node address (IP or hostname).
+            config_profile_inbounds: (Set of String) Set of inbound UUIDs enabled for this node's config profile. When omitted, the prior state value is preserved, preventing accidental removal of all active inbounds on update.
+            config_profile_uuid: (String) UUID of the config profile assigned to this node.
+            consumption_multiplier: (Number) User traffic consumption multiplier (0.0-100.0).
+            country_code: (String) ISO 3166-1 alpha-2 country code (2 chars).
+            created_at: (String) Creation timestamp.
+            id: (Number) Numeric database ID of the node (available on Remnawave 3.1+).
+            ip: (String) IPv4 or IPv6 address.
+            ips: (Attributes Set) IP addresses assigned to the node and their traffic roles (Remnawave 3.2.2+, up to 64). (see below for nested schema)
+            is_connected: (Boolean) Whether the node is currently connected.
+            is_connecting: (Boolean) Whether the node is in the process of connecting.
+            is_disabled: (Boolean) Whether the node is administratively disabled.
+            is_traffic_tracking_active: (Boolean) Enable traffic tracking for this node.
+            last_status_change: (String) Timestamp of the most recent connection status change.
+            last_status_message: (String) Most recent connection status message.
+            name: (String) Node name (3-30 chars).
+            node_consumption_multiplier: (Number) Node traffic consumption multiplier (0.0-100.0).
+            note: (String) Free-form note (max 255 chars).
+            notify_percent: (Number) Notify at this traffic usage percentage (0-100).
+            port: (Number) Node port for internal panel API communication.
+            provider_details: (String) Associated infrastructure provider summary as JSON.
+            provider_uuid: (String) Infrastructure provider UUID associated with the node.
+            proxy_url: (String, Sensitive) Optional SOCKS5 proxy URL used to reach the node.
+            status: (String) Traffic role of the address.
+            system: (String) Node system information and live statistics as JSON.
+            tags: (Set of String) Node tags (up to 10).
+            traffic_limit_bytes: (Number) Traffic limit in bytes for this node.
+            traffic_reset_day: (Number) Day of month (1-31) to reset traffic counter.
+            traffic_used_bytes: (Number) Traffic consumed by the node according to the panel.
+            updated_at: (String) Last update timestamp.
+            users_online: (Number) Number of users currently online on this node.
+            uuid: (String) UUID of the node (assigned by the panel).
+            versions: (String) Xray and node component versions as JSON.
+            view_position: (Number) Panel ordering position.
+            xray_uptime: (Number) Xray uptime reported by the node.
+        importStatements:
+            - |-
+              # Import a node by UUID on every supported Remnawave version.
+              terraform import remnawave_node.de_fra_01 00000000-0000-0000-0000-000000000000
+    remnawave_node_action:
+        subCategory: ""
+        description: Executes a one-time action on a Remnawave node (enable, disable, restart, or reset_traffic). Use triggers to force re-execution when values change. reset-traffic is accepted as a backward-compatible alias for reset_traffic (prefer the underscore form).
+        name: remnawave_node_action
+        title: remnawave_node_action Resource - terraform-provider-remnawave
+        examples:
+            - name: restart
+              manifest: |-
+                {
+                  "action": "restart",
+                  "force_restart": true,
+                  "node_uuid": "550e8400-e29b-41d4-a716-446655440000",
+                  "triggers": [
+                    "maintenance-window-2026-01"
+                  ]
+                }
+            - name: reset_traffic
+              manifest: |-
+                {
+                  "action": "reset_traffic",
+                  "node_uuid": "550e8400-e29b-41d4-a716-446655440000",
+                  "triggers": [
+                    "billing-period-2026-01"
+                  ]
+                }
+        argumentDocs:
+            action: '(String) Action to perform. One of: enable, disable, restart, reset_traffic. reset-traffic is accepted as a backward-compatible alias for reset_traffic.'
+            created_at: (String) Timestamp of when the action was last executed.
+            force_restart: (Boolean) Whether to force-restart the node (only meaningful for action = restart). Defaults to false.
+            id: (String) Opaque identifier for this action invocation. Always set to the node UUID.
+            node_uuid: (String) UUID of the target node.
+            triggers: (List of String) Arbitrary list of strings. When any value changes, the action is re-executed. Use timestamp() to force a re-run on every apply.
+        importStatements: []
+    remnawave_node_bulk_action:
+        subCategory: ""
+        description: 'Performs a bulk operation (enable, disable, restart, or reset_traffic) on one or more nodes. This is an imperative resource: the action runs when the resource is created and whenever its arguments change; an apply with no changes does not repeat it. Change triggers to force re-execution without changing the operation inputs.'
+        name: remnawave_node_bulk_action
+        title: remnawave_node_bulk_action Resource - terraform-provider-remnawave
+        examples:
+            - name: restart
+              manifest: |-
+                {
+                  "action": "restart",
+                  "triggers": {
+                    "maintenance_window": "2026-01"
+                  },
+                  "uuids": [
+                    "550e8400-e29b-41d4-a716-446655440000",
+                    "550e8400-e29b-41d4-a716-446655440001"
+                  ]
+                }
+        argumentDocs:
+            action: '(String) Bulk action to perform. One of: enable, disable, restart, reset_traffic.'
+            id: (String) Opaque identifier for this bulk action resource instance.
+            triggers: (Map of String) A map of arbitrary key/value pairs. When any value changes, the resource is re-applied and the action re-executed.
+            uuids: (List of String) List of node UUIDs to operate on.
+        importStatements: []
+    remnawave_node_metadata:
+        subCategory: ""
+        description: Manages free-form metadata for a Remnawave node. Metadata is upserted (PUT); there is no DELETE — clear it by setting metadata to {}.
+        name: remnawave_node_metadata
+        title: remnawave_node_metadata Resource - terraform-provider-remnawave
+        examples:
+            - name: info
+              manifest: |-
+                {
+                  "metadata": "${jsonencode({\n    datacenter = \"fra1\"\n    provider   = \"hetzner\"\n  })}",
+                  "node_uuid": "${remnawave_node.de_fra_01.uuid}"
+                }
+              references:
+                node_uuid: remnawave_node.de_fra_01.uuid
+        argumentDocs:
+            metadata: (String) Free-form metadata as a JSON object string, e.g. jsonencode({ location = "us-east" }).
+            node_uuid: (String) UUID of the node whose metadata is managed.
+            uuid: (String) UUID of the node this metadata belongs to (equals node_uuid).
+        importStatements:
+            - |-
+              # Import node metadata by node UUID.
+              terraform import remnawave_node_metadata.info 00000000-0000-0000-0000-000000000000
+    remnawave_node_plugin:
+        subCategory: ""
+        description: Manages a Remnawave node plugin.
+        name: remnawave_node_plugin
+        title: remnawave_node_plugin Resource - terraform-provider-remnawave
+        examples:
+            - name: pre_start
+              manifest: |-
+                {
+                  "name": "Pre-Start Cleanup",
+                  "plugin_config": "${jsonencode({\n    sharedLists = []\n    preStart = {\n      enabled = true\n      cleanupSockets = {\n        enabled = true\n        files   = [\"/dev/shm/*.sock\"]\n      }\n    }\n  })}"
+                }
+        argumentDocs:
+            name: (String) Plugin name (2-30 chars).
+            plugin_config: (String) Plugin config as JSON. Supported keys are sharedLists, torrentBlocker, ingressFilter, egressFilter, connectionDrop, and preStart (Remnawave 3.1+).
+            uuid: (String)
+        importStatements:
+            - |-
+              # Import a node plugin by UUID.
+              terraform import remnawave_node_plugin.pre_start 00000000-0000-0000-0000-000000000000
+    remnawave_panel_settings:
+        subCategory: ""
+        description: 'Manages Remnawave panel settings (singleton: branding, auth).'
+        name: remnawave_panel_settings
+        title: remnawave_panel_settings Resource - terraform-provider-remnawave
+        examples:
+            - name: main
+              manifest: |-
+                {
+                  "branding_logo_url": "https://example.com/logo.png",
+                  "branding_title": "My VPN Panel",
+                  "password_auth_enabled": true
+                }
+        argumentDocs:
+            branding_logo_url: (String) Panel branding logo URL.
+            branding_title: (String) Panel branding title.
+            id: (String) Always 'settings'.
+            oauth2_settings: (String, Sensitive) OAuth2 settings as JSON string. Contains configuration for github, pocketid, yandex, keycloak, generic, telegram providers.
+            passkey_settings: (String, Sensitive) Passkey/WebAuthn settings as JSON string.
+            password_auth_enabled: (Boolean) Enable password auth.
+        importStatements:
+            - |-
+              # Panel settings are a singleton; use the stable ID "settings".
+              terraform import remnawave_panel_settings.main settings
+    remnawave_passkey:
+        subCategory: ""
+        description: 'Manages a Remnawave WebAuthn passkey. This is an import-only resource: passkeys cannot be created via Terraform (registration requires an interactive WebAuthn ceremony). Import an existing passkey by its UUID, then destroy it with terraform destroy. Requires admin JWT auth (username/password), not an API token.'
+        name: remnawave_passkey
+        title: remnawave_passkey Resource - terraform-provider-remnawave
+        examples:
+            - name: laptop
+              manifest: '{}'
+        argumentDocs:
+            created_at: (String) Creation timestamp.
+            name: (String) Human-readable passkey name.
+            uuid: (String) Passkey UUID.
+        importStatements:
+            - |-
+              # Import an existing passkey by its UUID.
+              terraform import remnawave_passkey.laptop 00000000-0000-0000-0000-000000000000
+    remnawave_snippet:
+        subCategory: ""
+        description: Manages a Remnawave Xray config snippet (keyed by name).
+        name: remnawave_snippet
+        title: remnawave_snippet Resource - terraform-provider-remnawave
+        examples:
+            - name: routing_rules
+              manifest: |-
+                {
+                  "name": "block-ads",
+                  "snippet": "${jsonencode([\n    {\n      type        = \"field\"\n      outboundTag = \"block\"\n      domain      = [\"geosite:category-ads\"]\n    }\n  ])}"
+                }
+        argumentDocs:
+            name: (String) Snippet name (2-255 chars).
+            snippet: (String) Snippet content as JSON array string.
+        importStatements:
+            - |-
+              # Import a snippet by name.
+              terraform import remnawave_snippet.routing_rules my-snippet
+    remnawave_subpage_config:
+        subCategory: ""
+        description: Manages a Remnawave subscription page config.
+        name: remnawave_subpage_config
+        title: remnawave_subpage_config Resource - terraform-provider-remnawave
+        examples:
+            - name: custom
+              manifest: |-
+                {
+                  "name": "Custom Subpage"
+                }
+        argumentDocs:
+            config: (String) Subscription page config as a JSON string. Opaque to the provider — the panel manages the structure.
+            name: (String) Name of the subscription page config (2-30 chars, letters/numbers/underscores/dashes/spaces).
+            uuid: (String) UUID of the subscription page config.
+        importStatements:
+            - |-
+              # Import a subscription page config by UUID.
+              terraform import remnawave_subpage_config.custom 00000000-0000-0000-0000-000000000000
+    remnawave_subscription_settings:
+        subCategory: ""
+        description: Manages Remnawave subscription settings (singleton). Delete only removes from Terraform state.
+        name: remnawave_subscription_settings
+        title: remnawave_subscription_settings Resource - terraform-provider-remnawave
+        examples:
+            - name: main
+              manifest: |-
+                {
+                  "custom_response_headers": "${jsonencode({\n    X-Managed-By = \"terraform\"\n  })}",
+                  "is_show_custom_remarks": true,
+                  "randomize_hosts": true
+                }
+        argumentDocs:
+            custom_remarks: (String) Custom user-state remarks as JSON.
+            custom_response_headers: (String) Custom subscription response headers as a JSON object. Header names are treated case-insensitively.
+            happ_announce: (String) Happ announce message (max 200 chars). Supported on Remnawave 2.x; retained as a no-op in state on 3.0+.
+            happ_routing: (String) Happ routing config. Supported on Remnawave 2.x; retained as a no-op in state on 3.0+.
+            hwid_settings: (String) HWID enforcement settings as JSON.
+            id: (String) Always 'settings' — this is a singleton resource.
+            is_profile_webpage_url_enabled: (Boolean) Enable profile webpage URL. Supported on Remnawave 2.x; retained as a no-op in state on 3.0+.
+            is_show_custom_remarks: (Boolean) Show custom remarks for users.
+            profile_title: (String) Subscription profile title shown in VPN clients. Supported on Remnawave 2.x; retained as a no-op in state on 3.0+.
+            profile_update_interval: (Number) Subscription update interval in minutes. Supported on Remnawave 2.x; retained as a no-op in state on 3.0+.
+            randomize_hosts: (Boolean) Randomize host order in subscription.
+            response_rules: (String) Subscription response-rules configuration as JSON.
+            serve_json_at_base_subscription: (Boolean) Serve JSON at base subscription URL.
+            support_link: (String) Support link shown in subscription page. Supported on Remnawave 2.x; retained as a no-op in state on 3.0+.
+        importStatements:
+            - |-
+              # Subscription settings are a singleton; use the stable ID "settings".
+              terraform import remnawave_subscription_settings.main settings
+    remnawave_subscription_template:
+        subCategory: ""
+        description: Manages a Remnawave subscription template.
+        name: remnawave_subscription_template
+        title: remnawave_subscription_template Resource - terraform-provider-remnawave
+        examples:
+            - name: xray
+              manifest: |-
+                {
+                  "name": "Default XRAY_JSON",
+                  "template_type": "XRAY_JSON"
+                }
+        argumentDocs:
+            encoded_template_yaml: (String) Encoded template YAML.
+            name: (String) Template name (2-255 chars).
+            template_json: (String) Template JSON (opaque).
+            template_type: '(String) Type: XRAY_JSON, XRAY_BASE64, MIHOMO, STASH, CLASH, SINGBOX.'
+            uuid: (String)
+        importStatements:
+            - |-
+              # Import a subscription template by UUID.
+              terraform import remnawave_subscription_template.xray 00000000-0000-0000-0000-000000000000
+    remnawave_user:
+        subCategory: ""
+        description: Manages a Remnawave VPN user.
+        name: remnawave_user
+        title: remnawave_user Resource - terraform-provider-remnawave
+        examples:
+            - name: example
+              manifest: |-
+                {
+                  "description": "Managed by Terraform",
+                  "expire_at": "2027-01-01T00:00:00.000Z",
+                  "hwid_device_limit": 3,
+                  "tag": "CUSTOMER",
+                  "traffic_limit_bytes": 10737418240,
+                  "traffic_limit_strategy": "MONTH",
+                  "username": "john-doe"
+                }
+        argumentDocs:
+            active_internal_squads: (Set of String) UUIDs of internal squads assigned to the user.
+            created_at: (String) Creation timestamp. May be supplied when importing users into Remnawave.
+            description: (String) Free-form description.
+            email: (String) User email address.
+            expire_at: (String) Expiration date in ISO 8601 format.
+            external_squad_uuid: (String) External squad UUID assigned to the user. When omitted after import, the prior state value is preserved, preventing accidental removal of squad membership on unrelated updates.
+            first_connected_at: (String) Timestamp of the user's first connection.
+            hwid_device_limit: (Number) Max hardware devices allowed.
+            id: (Number) Numeric ID of the user.
+            last_connected_node_uuid: (String) UUID of the node used for the most recent connection.
+            last_traffic_reset_at: (String) Initial last-traffic-reset timestamp. Remnawave only accepts it during creation.
+            last_triggered_threshold: (Number) Last traffic notification threshold triggered by the panel.
+            lifetime_used_traffic_bytes: (Number) Lifetime traffic consumed by the user.
+            online_at: (String) Timestamp when the user was last observed online.
+            short_uuid: (String, Sensitive) Short UUID used in subscription URLs.
+            ss_password: (String, Sensitive) Shadowsocks password (8-32 chars). Auto-generated if not set.
+            status: '(String) User status: ACTIVE or DISABLED. LIMITED/EXPIRED are managed by the panel.'
+            sub_revoked_at: (String) Timestamp of the most recent subscription revocation.
+            subscription_url: (String, Sensitive) Subscription URL for the user.
+            tag: (String) User tag (uppercase letters, numbers, underscores; max 16).
+            telegram_id: (Number) Telegram user ID for notifications.
+            traffic_limit_bytes: (Number) Traffic limit in bytes. 0 = unlimited.
+            traffic_limit_strategy: '(String) Reset strategy: NO_RESET, DAY, WEEK, MONTH, MONTH_ROLLING.'
+            trojan_password: (String, Sensitive) Trojan protocol password (8-32 chars). Auto-generated if not set.
+            updated_at: (String) Last update timestamp.
+            used_traffic_bytes: (Number) Traffic used in the current reset period.
+            username: (String) Unique username (3-36 chars, alphanumeric + _ -).
+            uuid: '(String) User identifier: UUID on v2.x backends, numeric ID as string on v3.0+ (the id attribute is preferred).'
+            vless_uuid: (String, Sensitive) VLESS UUID. Auto-generated if not set.
+        importStatements:
+            - |-
+              # Remnawave 3.0+ uses the numeric user ID.
+              terraform import remnawave_user.example 42
+
+              # Remnawave 2.x uses the user UUID.
+              terraform import remnawave_user.example 00000000-0000-0000-0000-000000000000
+    remnawave_user_action:
+        subCategory: ""
+        description: Performs an imperative one-shot action on a Remnawave user (enable, disable, reset_traffic, revoke_subscription, extend_expiration). The action is re-executed whenever the triggers list changes value, making it suitable for recurring operations such as periodic traffic resets. reset-traffic is accepted as a backward-compatible alias for reset_traffic (prefer the underscore form). extend_expiration is available on Remnawave 3.0+ only.
+        name: remnawave_user_action
+        title: remnawave_user_action Resource - terraform-provider-remnawave
+        examples:
+            - name: reset
+              manifest: |-
+                {
+                  "action": "reset_traffic",
+                  "triggers": [
+                    "${timestamp()}"
+                  ],
+                  "user_uuid": "${remnawave_user.test.uuid}"
+                }
+              references:
+                user_uuid: remnawave_user.test.uuid
+              dependencies:
+                remnawave_user.test: |-
+                    {
+                      "expire_at": "2027-01-01T00:00:00.000Z",
+                      "traffic_limit_bytes": 10737418240,
+                      "username": "my-user"
+                    }
+            - name: extend
+              manifest: |-
+                {
+                  "action": "extend_expiration",
+                  "days": 30,
+                  "triggers": [
+                    "${timestamp()}"
+                  ],
+                  "user_uuid": "${remnawave_user.test.uuid}"
+                }
+              references:
+                user_uuid: remnawave_user.test.uuid
+              dependencies:
+                remnawave_user.test: |-
+                    {
+                      "expire_at": "2027-01-01T00:00:00.000Z",
+                      "traffic_limit_bytes": 10737418240,
+                      "username": "my-user"
+                    }
+        argumentDocs:
+            action: '(String) Action to perform. One of: enable, disable, reset_traffic, revoke_subscription, extend_expiration. reset-traffic is accepted as a backward-compatible alias. extend_expiration is v3.0+ only and requires the days attribute.'
+            days: (Number) Number of days (1-9999) to extend the user's expiration date. Required when action is extend_expiration; ignored for all other actions.
+            id: '(String) Composite identifier: <user_uuid>:.'
+            triggers: (List of String) Arbitrary list of strings. When any value changes, the action is re-executed. Commonly set to [timestamp()] for periodic re-runs.
+            user_uuid: (String) Identifier of the target user (UUID on v2.x, numeric ID on v3.0+).
+        importStatements:
+            - |-
+              # Remnawave 3.0+ uses <numeric_user_id>:<action>.
+              terraform import remnawave_user_action.extend "42:extend_expiration"
+
+              # Remnawave 2.x uses <user_uuid>:<action>.
+              terraform import remnawave_user_action.reset "00000000-0000-0000-0000-000000000000:reset_traffic"
+    remnawave_user_bulk_action:
+        subCategory: ""
+        description: 'Performs a bulk operation (reset_traffic, revoke_subscription, delete, or extend_expiration) on one or more users. This is an imperative resource: the action runs when the resource is created and whenever its arguments change; an apply with no changes does not repeat it. Change triggers to force re-execution without changing the operation inputs.'
+        name: remnawave_user_bulk_action
+        title: remnawave_user_bulk_action Resource - terraform-provider-remnawave
+        examples:
+            - name: extend_expiration
+              manifest: |-
+                {
+                  "action": "extend_expiration",
+                  "days": 30,
+                  "triggers": {
+                    "change_ticket": "OPS-1234"
+                  },
+                  "uuids": [
+                    "550e8400-e29b-41d4-a716-446655440000",
+                    "550e8400-e29b-41d4-a716-446655440001"
+                  ]
+                }
+        argumentDocs:
+            action: '(String) Bulk action to perform. One of: reset_traffic, revoke_subscription, delete, extend_expiration.'
+            days: (Number) Number of days (1-9999) to extend expiration. Required when action is extend_expiration; ignored otherwise.
+            id: (String) Opaque identifier for this bulk action resource instance.
+            triggers: (Map of String) A map of arbitrary key/value pairs. When any value changes, the resource is re-applied and the action re-executed.
+            uuids: '(List of String) List of user identifiers: UUIDs on Remnawave 2.x, numeric IDs encoded as strings on 3.0+.'
+        importStatements: []
+    remnawave_user_metadata:
+        subCategory: ""
+        description: Manages free-form metadata for a Remnawave user. Metadata is upserted (PUT); there is no DELETE — clear it by setting metadata to {}.
+        name: remnawave_user_metadata
+        title: remnawave_user_metadata Resource - terraform-provider-remnawave
+        examples:
+            - name: info
+              manifest: |-
+                {
+                  "metadata": "${jsonencode({\n    plan  = \"premium\"\n    notes = \"VIP customer\"\n  })}",
+                  "user_uuid": "${remnawave_user.example.uuid}"
+                }
+              references:
+                user_uuid: remnawave_user.example.uuid
+        argumentDocs:
+            metadata: (String) Free-form metadata as a JSON object string, e.g. jsonencode({ department = "engineering" }).
+            user_uuid: '(String) Identifier of the user whose metadata is managed: UUID on Remnawave 2.x, numeric ID on 3.0+.'
+            uuid: '(String) User identifier for this metadata (equals user_uuid): UUID on Remnawave 2.x, numeric ID on 3.0+.'
+        importStatements:
+            - |-
+              # Remnawave 3.0+ uses the numeric user ID.
+              terraform import remnawave_user_metadata.info 42
+
+              # Remnawave 2.x uses the user UUID.
+              terraform import remnawave_user_metadata.info 00000000-0000-0000-0000-000000000000

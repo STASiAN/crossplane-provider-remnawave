@@ -5,19 +5,31 @@ import (
 )
 
 // ExternalNameConfigs contains all external name configurations for this
-// provider.
+// provider. Remnawave assigns identifiers (UUIDs) server-side, so every
+// resource uses IdentifierFromProvider. This map also acts as the include
+// list: the imperative *_action and drop_connections resources are excluded
+// by not being listed here.
 var ExternalNameConfigs = map[string]config.ExternalName{
-	// Import requires using a randomly generated ID from provider: nl-2e21sda
-	"null_resource": idWithStub(),
-}
-
-func idWithStub() config.ExternalName {
-	e := config.IdentifierFromProvider
-	e.GetExternalNameFn = func(tfstate map[string]any) (string, error) {
-		en, _ := config.IDAsExternalName(tfstate)
-		return en, nil
-	}
-	return e
+	"remnawave_user":                  config.IdentifierFromProvider,
+	"remnawave_node":                  config.IdentifierFromProvider,
+	"remnawave_host":                  config.IdentifierFromProvider,
+	"remnawave_config_profile":        config.IdentifierFromProvider,
+	"remnawave_external_squad":        config.IdentifierFromProvider,
+	"remnawave_internal_squad":        config.IdentifierFromProvider,
+	"remnawave_subscription_template": config.IdentifierFromProvider,
+	"remnawave_subscription_settings": config.IdentifierFromProvider,
+	"remnawave_subpage_config":        config.IdentifierFromProvider,
+	"remnawave_panel_settings":        config.IdentifierFromProvider,
+	"remnawave_snippet":               config.IdentifierFromProvider,
+	"remnawave_node_plugin":           config.IdentifierFromProvider,
+	"remnawave_infra_provider":        config.IdentifierFromProvider,
+	"remnawave_billing_node":          config.IdentifierFromProvider,
+	"remnawave_billing_history":       config.IdentifierFromProvider,
+	"remnawave_api_token":             config.IdentifierFromProvider,
+	"remnawave_passkey":               config.IdentifierFromProvider,
+	"remnawave_user_metadata":         config.IdentifierFromProvider,
+	"remnawave_node_metadata":         config.IdentifierFromProvider,
+	"remnawave_hwid_device":           config.IdentifierFromProvider,
 }
 
 // ExternalNameConfigurations applies all external name configs listed in the

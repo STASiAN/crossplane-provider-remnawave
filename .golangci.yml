@@ -123,7 +123,7 @@ formatters:
       simplify: true
     goimports:
       local-prefixes:
-        - github.com/crossplane/upjet-provider-template
+        - github.com/STASiAN/crossplane-provider-remnawave
   exclusions:
     generated: lax
     paths:

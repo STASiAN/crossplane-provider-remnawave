@@ -1,0 +1,12 @@
+apiVersion: remnawave.crossplane.io/v1alpha1
+kind: HwidDevice
+metadata:
+  annotations:
+    meta.upbound.io/example-id: remnawave/v1alpha1/hwiddevice
+  labels:
+    testing.upbound.io/example-name: phone
+  name: phone
+spec:
+  forProvider:
+    hwid: device-fingerprint-abc123
+    userUuid: ${remnawave_user.example.uuid}

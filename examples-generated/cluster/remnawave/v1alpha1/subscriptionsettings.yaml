@@ -1,0 +1,16 @@
+apiVersion: remnawave.crossplane.io/v1alpha1
+kind: SubscriptionSettings
+metadata:
+  annotations:
+    meta.upbound.io/example-id: remnawave/v1alpha1/subscriptionsettings
+  labels:
+    testing.upbound.io/example-name: main
+  name: main
+spec:
+  forProvider:
+    customResponseHeaders: |-
+      ${jsonencode({
+          X-Managed-By = "terraform"
+        })}
+    isShowCustomRemarks: true
+    randomizeHosts: true

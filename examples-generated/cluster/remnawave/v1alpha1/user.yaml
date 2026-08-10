@@ -1,0 +1,17 @@
+apiVersion: remnawave.crossplane.io/v1alpha1
+kind: User
+metadata:
+  annotations:
+    meta.upbound.io/example-id: remnawave/v1alpha1/user
+  labels:
+    testing.upbound.io/example-name: example
+  name: example
+spec:
+  forProvider:
+    description: Managed by Terraform
+    expireAt: "2027-01-01T00:00:00.000Z"
+    hwidDeviceLimit: 3
+    tag: CUSTOMER
+    trafficLimitBytes: 10737418240
+    trafficLimitStrategy: MONTH
+    username: john-doe

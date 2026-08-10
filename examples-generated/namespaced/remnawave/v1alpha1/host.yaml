@@ -1,0 +1,19 @@
+apiVersion: remnawave.m.crossplane.io/v1alpha1
+kind: Host
+metadata:
+  annotations:
+    meta.upbound.io/example-id: remnawave/v1alpha1/host
+  labels:
+    testing.upbound.io/example-name: vless
+  name: vless
+  namespace: crossplane-system
+spec:
+  forProvider:
+    address: vpn.example.com
+    configProfileInboundUuid: ${remnawave_config_profile.default.inbounds[0].uuid}
+    configProfileUuid: ${remnawave_config_profile.default.uuid}
+    port: 443
+    remark: "\U0001F1E9\U0001F1EA Frankfurt"
+    tags:
+    - EU
+    - PREMIUM

@@ -1,0 +1,15 @@
+apiVersion: remnawave.crossplane.io/v1alpha1
+kind: User
+metadata:
+  name: john-doe
+spec:
+  forProvider:
+    username: john-doe
+    description: Managed by Crossplane
+    expireAt: "2027-01-01T00:00:00.000Z"
+    hwidDeviceLimit: 3
+    tag: CUSTOMER
+    trafficLimitBytes: 10737418240
+    trafficLimitStrategy: MONTH
+  providerConfigRef:
+    name: default

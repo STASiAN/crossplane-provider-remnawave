@@ -1,0 +1,14 @@
+apiVersion: remnawave.m.crossplane.io/v1alpha1
+kind: InfraProvider
+metadata:
+  annotations:
+    meta.upbound.io/example-id: remnawave/v1alpha1/infraprovider
+  labels:
+    testing.upbound.io/example-name: example
+  name: example
+  namespace: crossplane-system
+spec:
+  forProvider:
+    faviconLink: https://example.com/favicon.ico
+    loginUrl: https://billing.example.com/login
+    name: Provider Co

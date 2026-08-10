@@ -1,7 +1,14 @@
 apiVersion: meta.pkg.crossplane.io/v1
 kind: Provider
 metadata:
-  name: upjet-provider-template
+  name: crossplane-provider-remnawave
+  annotations:
+    meta.crossplane.io/maintainer: STASiAN
+    meta.crossplane.io/source: github.com/STASiAN/crossplane-provider-remnawave
+    meta.crossplane.io/license: Apache-2.0
+    meta.crossplane.io/description: |
+      Crossplane provider for the Remnawave proxy management panel, generated
+      with upjet from the batonogov/remnawave Terraform provider.
 spec:
   capabilities:
     - SafeStart

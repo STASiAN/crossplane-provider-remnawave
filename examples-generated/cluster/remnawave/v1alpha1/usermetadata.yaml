@@ -1,0 +1,16 @@
+apiVersion: remnawave.crossplane.io/v1alpha1
+kind: UserMetadata
+metadata:
+  annotations:
+    meta.upbound.io/example-id: remnawave/v1alpha1/usermetadata
+  labels:
+    testing.upbound.io/example-name: info
+  name: info
+spec:
+  forProvider:
+    metadata: |-
+      ${jsonencode({
+          plan  = "premium"
+          notes = "VIP customer"
+        })}
+    userUuid: ${remnawave_user.example.uuid}

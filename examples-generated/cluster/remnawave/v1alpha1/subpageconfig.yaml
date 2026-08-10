@@ -1,0 +1,11 @@
+apiVersion: remnawave.crossplane.io/v1alpha1
+kind: SubpageConfig
+metadata:
+  annotations:
+    meta.upbound.io/example-id: remnawave/v1alpha1/subpageconfig
+  labels:
+    testing.upbound.io/example-name: custom
+  name: custom
+spec:
+  forProvider:
+    name: Custom Subpage

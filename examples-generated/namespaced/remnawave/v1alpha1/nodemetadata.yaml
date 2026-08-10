@@ -1,0 +1,17 @@
+apiVersion: remnawave.m.crossplane.io/v1alpha1
+kind: NodeMetadata
+metadata:
+  annotations:
+    meta.upbound.io/example-id: remnawave/v1alpha1/nodemetadata
+  labels:
+    testing.upbound.io/example-name: info
+  name: info
+  namespace: crossplane-system
+spec:
+  forProvider:
+    metadata: |-
+      ${jsonencode({
+          datacenter = "fra1"
+          provider   = "hetzner"
+        })}
+    nodeUuid: ${remnawave_node.de_fra_01.uuid}

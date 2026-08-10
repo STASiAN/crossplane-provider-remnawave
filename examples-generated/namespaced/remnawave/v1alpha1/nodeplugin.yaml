@@ -1,0 +1,23 @@
+apiVersion: remnawave.m.crossplane.io/v1alpha1
+kind: NodePlugin
+metadata:
+  annotations:
+    meta.upbound.io/example-id: remnawave/v1alpha1/nodeplugin
+  labels:
+    testing.upbound.io/example-name: pre_start
+  name: pre-start
+  namespace: crossplane-system
+spec:
+  forProvider:
+    name: Pre-Start Cleanup
+    pluginConfig: |-
+      ${jsonencode({
+          sharedLists = []
+          preStart = {
+            enabled = true
+            cleanupSockets = {
+              enabled = true
+              files   = ["/dev/shm/*.sock"]
+            }
+          }
+        })}

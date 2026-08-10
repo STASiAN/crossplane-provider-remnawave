@@ -1,0 +1,17 @@
+apiVersion: remnawave.crossplane.io/v1alpha1
+kind: Host
+metadata:
+  name: vless-frankfurt
+spec:
+  forProvider:
+    address: vpn.example.com
+    port: 443
+    remark: "Frankfurt"
+    # UUIDs of an existing config profile and one of its inbounds.
+    configProfileUuid: 00000000-0000-0000-0000-000000000000
+    configProfileInboundUuid: 00000000-0000-0000-0000-000000000000
+    tags:
+      - EU
+      - PREMIUM
+  providerConfigRef:
+    name: default

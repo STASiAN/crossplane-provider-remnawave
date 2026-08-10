@@ -1,0 +1,19 @@
+apiVersion: remnawave.crossplane.io/v1alpha1
+kind: Snippet
+metadata:
+  annotations:
+    meta.upbound.io/example-id: remnawave/v1alpha1/snippet
+  labels:
+    testing.upbound.io/example-name: routing_rules
+  name: routing-rules
+spec:
+  forProvider:
+    name: block-ads
+    snippet: |-
+      ${jsonencode([
+          {
+            type        = "field"
+            outboundTag = "block"
+            domain      = ["geosite:category-ads"]
+          }
+        ])}

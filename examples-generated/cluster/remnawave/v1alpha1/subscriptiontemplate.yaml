@@ -1,0 +1,12 @@
+apiVersion: remnawave.crossplane.io/v1alpha1
+kind: SubscriptionTemplate
+metadata:
+  annotations:
+    meta.upbound.io/example-id: remnawave/v1alpha1/subscriptiontemplate
+  labels:
+    testing.upbound.io/example-name: xray
+  name: xray
+spec:
+  forProvider:
+    name: Default XRAY_JSON
+    templateType: XRAY_JSON

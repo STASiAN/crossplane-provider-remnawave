@@ -1,0 +1,15 @@
+apiVersion: remnawave.m.crossplane.io/v1alpha1
+kind: APIToken
+metadata:
+  annotations:
+    meta.upbound.io/example-id: remnawave/v1alpha1/apitoken
+  labels:
+    testing.upbound.io/example-name: ci
+  name: ci
+  namespace: crossplane-system
+spec:
+  forProvider:
+    expiresInDays: 30
+    name: ci-deploy
+    scopes:
+    - '*'

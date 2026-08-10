@@ -1,0 +1,14 @@
+apiVersion: remnawave.m.crossplane.io/v1alpha1
+kind: PanelSettings
+metadata:
+  annotations:
+    meta.upbound.io/example-id: remnawave/v1alpha1/panelsettings
+  labels:
+    testing.upbound.io/example-name: main
+  name: main
+  namespace: crossplane-system
+spec:
+  forProvider:
+    brandingLogoUrl: https://example.com/logo.png
+    brandingTitle: My VPN Panel
+    passwordAuthEnabled: true

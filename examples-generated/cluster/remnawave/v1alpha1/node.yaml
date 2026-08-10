@@ -1,0 +1,16 @@
+apiVersion: remnawave.crossplane.io/v1alpha1
+kind: Node
+metadata:
+  annotations:
+    meta.upbound.io/example-id: remnawave/v1alpha1/node
+  labels:
+    testing.upbound.io/example-name: de_fra_01
+  name: de-fra-01
+spec:
+  forProvider:
+    address: 1.2.3.4
+    configProfileInbounds:
+    - ${remnawave_config_profile.default.inbounds[0].uuid}
+    configProfileUuid: ${remnawave_config_profile.default.uuid}
+    name: de-fra-01
+    port: 443

@@ -1,0 +1,19 @@
+apiVersion: remnawave.crossplane.io/v1alpha1
+kind: ExternalSquad
+metadata:
+  annotations:
+    meta.upbound.io/example-id: remnawave/v1alpha1/externalsquad
+  labels:
+    testing.upbound.io/example-name: standard
+  name: standard
+spec:
+  forProvider:
+    name: Standard
+    responseHeadersAdd: |-
+      ${jsonencode({
+          X-Squad = "standard"
+        })}
+    responseHeadersRemove: |-
+      ${jsonencode([
+          "X-Legacy-Header",
+        ])}

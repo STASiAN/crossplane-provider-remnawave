@@ -1,0 +1,15 @@
+apiVersion: remnawave.m.crossplane.io/v1alpha1
+kind: ConfigProfile
+metadata:
+  annotations:
+    meta.upbound.io/example-id: remnawave/v1alpha1/configprofile
+  labels:
+    testing.upbound.io/example-name: default
+  name: default
+  namespace: crossplane-system
+spec:
+  forProvider:
+    configSecretRef:
+      key: example-key
+      name: example-secret
+    name: default-profile
