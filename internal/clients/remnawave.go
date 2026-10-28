@@ -82,7 +82,7 @@ func TerraformSetupBuilder(version, providerSource, providerVersion string) terr
 		}
 		// A fresh instance per setup: upjet configures it with this
 		// ProviderConfig's credentials.
-		ps.FrameworkProvider = tfprovider.New(providerVersion)()
+		ps.FrameworkProvider = withTemplateWorkaround(tfprovider.New(providerVersion)(), panelConnFrom(ps.Configuration))
 		return ps, nil
 	}
 }
