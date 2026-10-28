@@ -143,7 +143,7 @@ func (r *templateWorkaroundResource) Update(ctx context.Context, req resource.Up
 	}
 	// Read the result back through the provider so the state has its usual form.
 	readResp := resource.ReadResponse{State: req.State}
-	r.Resource.Read(ctx, resource.ReadRequest{State: req.State}, &readResp)
+	r.Read(ctx, resource.ReadRequest{State: req.State}, &readResp)
 	resp.Diagnostics.Append(readResp.Diagnostics...)
 	resp.State = readResp.State
 }
