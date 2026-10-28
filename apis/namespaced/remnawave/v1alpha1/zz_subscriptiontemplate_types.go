@@ -16,7 +16,7 @@ import (
 type SubscriptionTemplateInitParameters struct {
 
 	// (String) Encoded template YAML.
-	// Encoded template YAML.
+	// Template YAML as plain text; the provider base64-encodes it for the panel.
 	EncodedTemplateYaml *string `json:"encodedTemplateYaml,omitempty" tf:"encoded_template_yaml,omitempty"`
 
 	// 255 chars).
@@ -35,7 +35,7 @@ type SubscriptionTemplateInitParameters struct {
 type SubscriptionTemplateObservation struct {
 
 	// (String) Encoded template YAML.
-	// Encoded template YAML.
+	// Template YAML as plain text; the provider base64-encodes it for the panel.
 	EncodedTemplateYaml *string `json:"encodedTemplateYaml,omitempty" tf:"encoded_template_yaml,omitempty"`
 
 	ID *string `json:"id,omitempty" tf:"id,omitempty"`
@@ -59,7 +59,7 @@ type SubscriptionTemplateObservation struct {
 type SubscriptionTemplateParameters struct {
 
 	// (String) Encoded template YAML.
-	// Encoded template YAML.
+	// Template YAML as plain text; the provider base64-encodes it for the panel.
 	// +kubebuilder:validation:Optional
 	EncodedTemplateYaml *string `json:"encodedTemplateYaml,omitempty" tf:"encoded_template_yaml,omitempty"`
 

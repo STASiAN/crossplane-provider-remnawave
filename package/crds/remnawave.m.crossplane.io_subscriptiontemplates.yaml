@@ -62,7 +62,7 @@ spec:
                   encodedTemplateYaml:
                     description: |-
                       (String) Encoded template YAML.
-                      Encoded template YAML.
+                      Template YAML as plain text; the provider base64-encodes it for the panel.
                     type: string
                   name:
                     description: |-
@@ -96,7 +96,7 @@ spec:
                   encodedTemplateYaml:
                     description: |-
                       (String) Encoded template YAML.
-                      Encoded template YAML.
+                      Template YAML as plain text; the provider base64-encodes it for the panel.
                     type: string
                   name:
                     description: |-
@@ -190,7 +190,7 @@ spec:
                   encodedTemplateYaml:
                     description: |-
                       (String) Encoded template YAML.
-                      Encoded template YAML.
+                      Template YAML as plain text; the provider base64-encodes it for the panel.
                     type: string
                   id:
                     type: string
