@@ -20,8 +20,9 @@ type SubscriptionSettingsInitParameters struct {
 	CustomRemarks *string `json:"customRemarks,omitempty" tf:"custom_remarks,omitempty"`
 
 	// insensitively.
-	// Custom subscription response headers as a JSON object. Header names are treated case-insensitively.
-	CustomResponseHeaders *string `json:"customResponseHeaders,omitempty" tf:"custom_response_headers,omitempty"`
+	// Headers the panel returns on every subscription fetch, by name.
+	// +mapType=granular
+	CustomResponseHeaders map[string]*string `json:"customResponseHeaders,omitempty" tf:"custom_response_headers,omitempty"`
 
 	// op in state on 3.0+.
 	// Happ announce message (max 200 chars). Supported on Remnawave 2.x; retained as a no-op in state on 3.0+.
@@ -75,8 +76,9 @@ type SubscriptionSettingsObservation struct {
 	CustomRemarks *string `json:"customRemarks,omitempty" tf:"custom_remarks,omitempty"`
 
 	// insensitively.
-	// Custom subscription response headers as a JSON object. Header names are treated case-insensitively.
-	CustomResponseHeaders *string `json:"customResponseHeaders,omitempty" tf:"custom_response_headers,omitempty"`
+	// Headers the panel returns on every subscription fetch, by name.
+	// +mapType=granular
+	CustomResponseHeaders map[string]*string `json:"customResponseHeaders,omitempty" tf:"custom_response_headers,omitempty"`
 
 	// op in state on 3.0+.
 	// Happ announce message (max 200 chars). Supported on Remnawave 2.x; retained as a no-op in state on 3.0+.
@@ -134,9 +136,10 @@ type SubscriptionSettingsParameters struct {
 	CustomRemarks *string `json:"customRemarks,omitempty" tf:"custom_remarks,omitempty"`
 
 	// insensitively.
-	// Custom subscription response headers as a JSON object. Header names are treated case-insensitively.
+	// Headers the panel returns on every subscription fetch, by name.
 	// +kubebuilder:validation:Optional
-	CustomResponseHeaders *string `json:"customResponseHeaders,omitempty" tf:"custom_response_headers,omitempty"`
+	// +mapType=granular
+	CustomResponseHeaders map[string]*string `json:"customResponseHeaders,omitempty" tf:"custom_response_headers,omitempty"`
 
 	// op in state on 3.0+.
 	// Happ announce message (max 200 chars). Supported on Remnawave 2.x; retained as a no-op in state on 3.0+.

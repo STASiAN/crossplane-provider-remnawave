@@ -4380,8 +4380,19 @@ func (in *SubscriptionSettingsInitParameters) DeepCopyInto(out *SubscriptionSett
 	}
 	if in.CustomResponseHeaders != nil {
 		in, out := &in.CustomResponseHeaders, &out.CustomResponseHeaders
-		*out = new(string)
-		**out = **in
+		*out = make(map[string]*string, len(*in))
+		for key, val := range *in {
+			var outVal *string
+			if val == nil {
+				(*out)[key] = nil
+			} else {
+				inVal := (*in)[key]
+				in, out := &inVal, &outVal
+				*out = new(string)
+				**out = **in
+			}
+			(*out)[key] = outVal
+		}
 	}
 	if in.HappAnnounce != nil {
 		in, out := &in.HappAnnounce, &out.HappAnnounce
@@ -4492,8 +4503,19 @@ func (in *SubscriptionSettingsObservation) DeepCopyInto(out *SubscriptionSetting
 	}
 	if in.CustomResponseHeaders != nil {
 		in, out := &in.CustomResponseHeaders, &out.CustomResponseHeaders
-		*out = new(string)
-		**out = **in
+		*out = make(map[string]*string, len(*in))
+		for key, val := range *in {
+			var outVal *string
+			if val == nil {
+				(*out)[key] = nil
+			} else {
+				inVal := (*in)[key]
+				in, out := &inVal, &outVal
+				*out = new(string)
+				**out = **in
+			}
+			(*out)[key] = outVal
+		}
 	}
 	if in.HappAnnounce != nil {
 		in, out := &in.HappAnnounce, &out.HappAnnounce
@@ -4577,8 +4599,19 @@ func (in *SubscriptionSettingsParameters) DeepCopyInto(out *SubscriptionSettings
 	}
 	if in.CustomResponseHeaders != nil {
 		in, out := &in.CustomResponseHeaders, &out.CustomResponseHeaders
-		*out = new(string)
-		**out = **in
+		*out = make(map[string]*string, len(*in))
+		for key, val := range *in {
+			var outVal *string
+			if val == nil {
+				(*out)[key] = nil
+			} else {
+				inVal := (*in)[key]
+				in, out := &inVal, &outVal
+				*out = new(string)
+				**out = **in
+			}
+			(*out)[key] = outVal
+		}
 	}
 	if in.HappAnnounce != nil {
 		in, out := &in.HappAnnounce, &out.HappAnnounce

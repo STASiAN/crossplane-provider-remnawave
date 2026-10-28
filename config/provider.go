@@ -38,7 +38,7 @@ func GetProvider() *ujconfig.Provider {
 		))
 
 	for _, configure := range []func(provider *ujconfig.Provider){
-		// add custom config functions
+		configureSubscriptionSettings,
 	} {
 		configure(pc)
 	}
@@ -65,7 +65,7 @@ func GetProviderNamespaced() *ujconfig.Provider {
 		}))
 
 	for _, configure := range []func(provider *ujconfig.Provider){
-		// add custom config functions
+		configureSubscriptionSettings,
 	} {
 		configure(pc)
 	}

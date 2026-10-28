@@ -65,10 +65,13 @@ spec:
                       Custom user-state remarks as JSON.
                     type: string
                   customResponseHeaders:
+                    additionalProperties:
+                      type: string
                     description: |-
                       insensitively.
-                      Custom subscription response headers as a JSON object. Header names are treated case-insensitively.
-                    type: string
+                      Headers the panel returns on every subscription fetch, by name.
+                    type: object
+                    x-kubernetes-map-type: granular
                   happAnnounce:
                     description: |-
                       op in state on 3.0+.
@@ -144,10 +147,13 @@ spec:
                       Custom user-state remarks as JSON.
                     type: string
                   customResponseHeaders:
+                    additionalProperties:
+                      type: string
                     description: |-
                       insensitively.
-                      Custom subscription response headers as a JSON object. Header names are treated case-insensitively.
-                    type: string
+                      Headers the panel returns on every subscription fetch, by name.
+                    type: object
+                    x-kubernetes-map-type: granular
                   happAnnounce:
                     description: |-
                       op in state on 3.0+.
@@ -274,10 +280,13 @@ spec:
                       Custom user-state remarks as JSON.
                     type: string
                   customResponseHeaders:
+                    additionalProperties:
+                      type: string
                     description: |-
                       insensitively.
-                      Custom subscription response headers as a JSON object. Header names are treated case-insensitively.
-                    type: string
+                      Headers the panel returns on every subscription fetch, by name.
+                    type: object
+                    x-kubernetes-map-type: granular
                   happAnnounce:
                     description: |-
                       op in state on 3.0+.
