@@ -13,8 +13,11 @@ permissions:
 env:
   DOCKER_BUILDX_VERSION: 'v0.34.1'
   UPBOUND_REGISTRY_ORG: xpkg.upbound.io/stasian
-  # Upbound robot credentials; the Upbound steps are skipped while unset.
-  XPKG_ACCESS_ID: ${{ secrets.XPKG_ACCESS_ID }}
+  # xpkg.upbound.io accepts a personal access token only with the Upbound
+  # username, not the token's access ID.
+  UPBOUND_USERNAME: stasian
+  # The Upbound steps are skipped while the token is unset.
+  XPKG_TOKEN: ${{ secrets.XPKG_TOKEN }}
 
 jobs:
   publish:
@@ -64,13 +67,13 @@ jobs:
         run: make publish BRANCH_NAME=main
 
       - name: Login to Upbound
-        if: env.XPKG_ACCESS_ID != ''
+        if: env.XPKG_TOKEN != ''
         uses: docker/login-action@v3
         with:
           registry: xpkg.upbound.io
-          username: ${{ secrets.XPKG_ACCESS_ID }}
+          username: ${{ env.UPBOUND_USERNAME }}
           password: ${{ secrets.XPKG_TOKEN }}
 
       - name: Publish Package to xpkg.upbound.io
-        if: env.XPKG_ACCESS_ID != ''
+        if: env.XPKG_TOKEN != ''
         run: make xpkg.release.publish XPKG_REG_ORGS=${{ env.UPBOUND_REGISTRY_ORG }} XPKG_REG_ORGS_NO_PROMOTE=${{ env.UPBOUND_REGISTRY_ORG }}
