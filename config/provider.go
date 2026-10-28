@@ -5,12 +5,17 @@ import (
 	_ "embed"
 
 	ujconfig "github.com/crossplane/upjet/v2/pkg/config"
+
+	tfprovider "github.com/batonogov/terraform-provider-remnawave/provider"
 )
 
 const (
 	resourcePrefix = "remnawave"
 	modulePath     = "github.com/STASiAN/crossplane-provider-remnawave"
 )
+
+// tfProviderVersion is only reported to the embedded Terraform provider.
+const tfProviderVersion = "crossplane"
 
 //go:embed schema.json
 var providerSchema string
@@ -22,7 +27,10 @@ var providerMetadata string
 func GetProvider() *ujconfig.Provider {
 	pc := ujconfig.NewProvider([]byte(providerSchema), resourcePrefix, modulePath, []byte(providerMetadata),
 		ujconfig.WithRootGroup("remnawave.crossplane.io"),
-		ujconfig.WithIncludeList(ExternalNameConfigured()),
+		// Every resource goes through the embedded Plugin Framework provider.
+		ujconfig.WithIncludeList([]string{}),
+		ujconfig.WithTerraformPluginFrameworkIncludeList(ExternalNameConfigured()),
+		ujconfig.WithTerraformPluginFrameworkProvider(tfprovider.New(tfProviderVersion)()),
 		ujconfig.WithFeaturesPackage("internal/features"),
 		ujconfig.WithDefaultResourceOptions(
 			ExternalNameConfigurations(),
@@ -43,7 +51,10 @@ func GetProvider() *ujconfig.Provider {
 func GetProviderNamespaced() *ujconfig.Provider {
 	pc := ujconfig.NewProvider([]byte(providerSchema), resourcePrefix, modulePath, []byte(providerMetadata),
 		ujconfig.WithRootGroup("remnawave.m.crossplane.io"),
-		ujconfig.WithIncludeList(ExternalNameConfigured()),
+		// Every resource goes through the embedded Plugin Framework provider.
+		ujconfig.WithIncludeList([]string{}),
+		ujconfig.WithTerraformPluginFrameworkIncludeList(ExternalNameConfigured()),
+		ujconfig.WithTerraformPluginFrameworkProvider(tfprovider.New(tfProviderVersion)()),
 		ujconfig.WithFeaturesPackage("internal/features"),
 		ujconfig.WithDefaultResourceOptions(
 			ExternalNameConfigurations(),

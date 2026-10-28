@@ -149,6 +149,8 @@ func main() {
 	metrics.Registry.MustRegister(metricRecorder)
 	metrics.Registry.MustRegister(stateMetrics)
 
+	operationTrackerStore := tjcontroller.NewOperationStore(log)
+
 	clusterOpts := tjcontroller.Options{
 		Options: xpcontroller.Options{
 			Logger:                  log,
@@ -166,8 +168,10 @@ func main() {
 		// use the following WorkspaceStoreOption to enable the shared gRPC mode
 		// terraform.WithProviderRunner(terraform.NewSharedProvider(log, os.Getenv("TERRAFORM_NATIVE_PROVIDER_PATH"), terraform.WithNativeProviderArgs("-debuggable")))
 		WorkspaceStore: terraform.NewWorkspaceStore(log),
-		SetupFn:        clients.TerraformSetupBuilder(*terraformVersion, *providerSource, *providerVersion),
-		StartWebhooks:  *certsDir != "",
+		// Required by the Terraform Plugin Framework controllers.
+		OperationTrackerStore: operationTrackerStore,
+		SetupFn:               clients.TerraformSetupBuilder(*terraformVersion, *providerSource, *providerVersion),
+		StartWebhooks:         *certsDir != "",
 	}
 
 	namespacedOpts := tjcontroller.Options{
@@ -187,8 +191,10 @@ func main() {
 		// use the following WorkspaceStoreOption to enable the shared gRPC mode
 		// terraform.WithProviderRunner(terraform.NewSharedProvider(log, os.Getenv("TERRAFORM_NATIVE_PROVIDER_PATH"), terraform.WithNativeProviderArgs("-debuggable")))
 		WorkspaceStore: terraform.NewWorkspaceStore(log),
-		SetupFn:        clients.TerraformSetupBuilder(*terraformVersion, *providerSource, *providerVersion),
-		StartWebhooks:  *certsDir != "",
+		// Required by the Terraform Plugin Framework controllers.
+		OperationTrackerStore: operationTrackerStore,
+		SetupFn:               clients.TerraformSetupBuilder(*terraformVersion, *providerSource, *providerVersion),
+		StartWebhooks:         *certsDir != "",
 	}
 
 	if *enableManagementPolicies {

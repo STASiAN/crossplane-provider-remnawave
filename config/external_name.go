@@ -9,6 +9,15 @@ import (
 // attribute, so IDAsExternalName cannot find the identifier in the tfstate.
 var uuidAsIdentifier = func() config.ExternalName {
 	e := config.IdentifierFromProvider
+	// The Terraform Plugin Framework client reads a resource through its prior
+	// state, so the identifier has to be put into `uuid` there. It is
+	// computed-only, hence kept out of the configuration.
+	e.SetIdentifierArgumentFn = func(base map[string]any, name string) {
+		if name != "" {
+			base["uuid"] = name
+		}
+	}
+	e.TFPluginFrameworkOptions.ComputedIdentifierAttributes = []string{"uuid"}
 	e.GetExternalNameFn = func(tfstate map[string]any) (string, error) {
 		if v, ok := tfstate["uuid"].(string); ok && v != "" {
 			return v, nil

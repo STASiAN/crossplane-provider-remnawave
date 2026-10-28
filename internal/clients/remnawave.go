@@ -11,6 +11,8 @@ import (
 
 	"github.com/crossplane/upjet/v2/pkg/terraform"
 
+	tfprovider "github.com/batonogov/terraform-provider-remnawave/provider"
+
 	clusterv1beta1 "github.com/STASiAN/crossplane-provider-remnawave/apis/cluster/v1beta1"
 	namespacedv1beta1 "github.com/STASiAN/crossplane-provider-remnawave/apis/namespaced/v1beta1"
 )
@@ -78,6 +80,9 @@ func TerraformSetupBuilder(version, providerSource, providerVersion string) terr
 				ps.Configuration[k] = v
 			}
 		}
+		// A fresh instance per setup: upjet configures it with this
+		// ProviderConfig's credentials.
+		ps.FrameworkProvider = tfprovider.New(providerVersion)()
 		return ps, nil
 	}
 }
