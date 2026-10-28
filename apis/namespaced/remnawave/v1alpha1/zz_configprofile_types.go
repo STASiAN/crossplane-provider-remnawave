@@ -22,6 +22,9 @@ type ConfigProfileInitParameters struct {
 	// 30 chars, letters/numbers/underscores/dashes/spaces).
 	// Profile name (2-30 chars, letters/numbers/underscores/dashes/spaces).
 	Name *string `json:"name,omitempty" tf:"name,omitempty"`
+
+	// Reality private key, set as realitySettings.privateKey of every inbound that has realitySettings.
+	RealityPrivateKeySecretRef *v2.LocalSecretKeySelector `json:"realityPrivateKeySecretRef,omitempty" tf:"-"`
 }
 
 type ConfigProfileObservation struct {
@@ -53,6 +56,10 @@ type ConfigProfileParameters struct {
 	// Profile name (2-30 chars, letters/numbers/underscores/dashes/spaces).
 	// +kubebuilder:validation:Optional
 	Name *string `json:"name,omitempty" tf:"name,omitempty"`
+
+	// Reality private key, set as realitySettings.privateKey of every inbound that has realitySettings.
+	// +kubebuilder:validation:Optional
+	RealityPrivateKeySecretRef *v2.LocalSecretKeySelector `json:"realityPrivateKeySecretRef,omitempty" tf:"-"`
 }
 
 type InboundsInitParameters struct {

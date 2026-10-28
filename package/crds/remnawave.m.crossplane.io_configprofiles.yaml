@@ -78,6 +78,19 @@ spec:
                       30 chars, letters/numbers/underscores/dashes/spaces).
                       Profile name (2-30 chars, letters/numbers/underscores/dashes/spaces).
                     type: string
+                  realityPrivateKeySecretRef:
+                    description: Reality private key, set as realitySettings.privateKey
+                      of every inbound that has realitySettings.
+                    properties:
+                      key:
+                        type: string
+                      name:
+                        description: Name of the secret.
+                        type: string
+                    required:
+                    - key
+                    - name
+                    type: object
                 type: object
               initProvider:
                 description: |-
@@ -111,6 +124,19 @@ spec:
                       30 chars, letters/numbers/underscores/dashes/spaces).
                       Profile name (2-30 chars, letters/numbers/underscores/dashes/spaces).
                     type: string
+                  realityPrivateKeySecretRef:
+                    description: Reality private key, set as realitySettings.privateKey
+                      of every inbound that has realitySettings.
+                    properties:
+                      key:
+                        type: string
+                      name:
+                        description: Name of the secret.
+                        type: string
+                    required:
+                    - key
+                    - name
+                    type: object
                 type: object
               managementPolicies:
                 default:

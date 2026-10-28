@@ -21,7 +21,7 @@ func (mg *ConfigProfile) GetTerraformResourceType() string {
 
 // GetConnectionDetailsMapping for this ConfigProfile
 func (tr *ConfigProfile) GetConnectionDetailsMapping() map[string]string {
-	return map[string]string{"config": "configSecretRef", "inbounds[*].raw_inbound": "status.atProvider.inbounds[*].rawInbound"}
+	return map[string]string{"config": "configSecretRef", "inbounds[*].raw_inbound": "status.atProvider.inbounds[*].rawInbound", "reality_private_key": "realityPrivateKeySecretRef"}
 }
 
 // GetObservation of this ConfigProfile
