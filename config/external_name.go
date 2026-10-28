@@ -4,31 +4,46 @@ import (
 	"github.com/crossplane/upjet/v2/pkg/config"
 )
 
+// uuidAsIdentifier is IdentifierFromProvider for resources whose Terraform
+// schema carries the server-assigned identifier in `uuid` and has no `id`
+// attribute, so IDAsExternalName cannot find the identifier in the tfstate.
+var uuidAsIdentifier = func() config.ExternalName {
+	e := config.IdentifierFromProvider
+	e.GetExternalNameFn = func(tfstate map[string]any) (string, error) {
+		if v, ok := tfstate["uuid"].(string); ok && v != "" {
+			return v, nil
+		}
+		return config.IDAsExternalName(tfstate)
+	}
+	return e
+}()
+
 // ExternalNameConfigs contains all external name configurations for this
 // provider. Remnawave assigns identifiers (UUIDs) server-side, so every
-// resource uses IdentifierFromProvider. This map also acts as the include
+// resource uses IdentifierFromProvider; those whose schema has `uuid` instead
+// of `id` read the identifier from it. This map also acts as the include
 // list: the imperative *_action and drop_connections resources are excluded
 // by not being listed here.
 var ExternalNameConfigs = map[string]config.ExternalName{
 	"remnawave_user":                  config.IdentifierFromProvider,
 	"remnawave_node":                  config.IdentifierFromProvider,
-	"remnawave_host":                  config.IdentifierFromProvider,
-	"remnawave_config_profile":        config.IdentifierFromProvider,
-	"remnawave_external_squad":        config.IdentifierFromProvider,
-	"remnawave_internal_squad":        config.IdentifierFromProvider,
-	"remnawave_subscription_template": config.IdentifierFromProvider,
+	"remnawave_host":                  uuidAsIdentifier,
+	"remnawave_config_profile":        uuidAsIdentifier,
+	"remnawave_external_squad":        uuidAsIdentifier,
+	"remnawave_internal_squad":        uuidAsIdentifier,
+	"remnawave_subscription_template": uuidAsIdentifier,
 	"remnawave_subscription_settings": config.IdentifierFromProvider,
-	"remnawave_subpage_config":        config.IdentifierFromProvider,
+	"remnawave_subpage_config":        uuidAsIdentifier,
 	"remnawave_panel_settings":        config.IdentifierFromProvider,
 	"remnawave_snippet":               config.IdentifierFromProvider,
-	"remnawave_node_plugin":           config.IdentifierFromProvider,
-	"remnawave_infra_provider":        config.IdentifierFromProvider,
-	"remnawave_billing_node":          config.IdentifierFromProvider,
-	"remnawave_billing_history":       config.IdentifierFromProvider,
-	"remnawave_api_token":             config.IdentifierFromProvider,
-	"remnawave_passkey":               config.IdentifierFromProvider,
-	"remnawave_user_metadata":         config.IdentifierFromProvider,
-	"remnawave_node_metadata":         config.IdentifierFromProvider,
+	"remnawave_node_plugin":           uuidAsIdentifier,
+	"remnawave_infra_provider":        uuidAsIdentifier,
+	"remnawave_billing_node":          uuidAsIdentifier,
+	"remnawave_billing_history":       uuidAsIdentifier,
+	"remnawave_api_token":             uuidAsIdentifier,
+	"remnawave_passkey":               uuidAsIdentifier,
+	"remnawave_user_metadata":         uuidAsIdentifier,
+	"remnawave_node_metadata":         uuidAsIdentifier,
 	"remnawave_hwid_device":           config.IdentifierFromProvider,
 }
 
