@@ -174,7 +174,7 @@ resources:
         title: remnawave_host Resource - terraform-provider-remnawave
         examples:
             - name: vless
-              manifest: "{\n  \"address\": \"vpn.example.com\",\n  \"config_profile_inbound_uuid\": \"${remnawave_config_profile.default.inbounds[0].uuid}\",\n  \"config_profile_uuid\": \"${remnawave_config_profile.default.uuid}\",\n  \"port\": 443,\n  \"remark\": \"\U0001F1E9\U0001F1EA Frankfurt\",\n  \"tags\": [\n    \"EU\",\n    \"PREMIUM\"\n  ]\n}"
+              manifest: "{\n  \"address\": \"vpn.example.com\",\n  \"config_profile_inbound_uuid\": \"${remnawave_config_profile.default.inbounds[0].uuid}\",\n  \"config_profile_uuid\": \"${remnawave_config_profile.default.uuid}\",\n  \"mapper\": \"${jsonencode({\\n    mihomo  = [{ op = \\\"set\\\", to = \\\"tfo\\\", value = true }]\\n    singbox = [{ op = \\\"set\\\", to = \\\"tcp_fast_open\\\", value = true }]\\n  })}\",\n  \"port\": 443,\n  \"remark\": \"\U0001F1E9\U0001F1EA Frankfurt\",\n  \"tags\": [\n    \"EU\",\n    \"PREMIUM\"\n  ]\n}"
               references:
                 config_profile_inbound_uuid: remnawave_config_profile.default.inbounds[0].uuid
                 config_profile_uuid: remnawave_config_profile.default.uuid
@@ -184,13 +184,16 @@ resources:
             config_profile_inbound_uuid: (String) UUID of the inbound within the config profile.
             config_profile_uuid: (String) UUID of the config profile this host belongs to.
             exclude_from_subscription_types: (Set of String) Subscription template types from which this host is excluded.
-            excluded_internal_squads: (List of String) Internal squad UUIDs from which this host is excluded.
+            excluded_internal_squads: (List of String, Deprecated) Internal squad UUIDs from which this host is excluded.
             final_mask: (String) Final mask configuration as JSON.
             fingerprint: (String) TLS fingerprint (e.g. chrome, firefox).
             host_header: (String) Host header for HTTP/WebSocket.
+            internal_squads: (List of String) Internal squad UUIDs the internal_squads_mode applies to (Remnawave 3.4+). An empty list means "exclude none" and is not allowed with ALLOW_ONLY.
+            internal_squads_mode: '(String) Internal squad selection mode (Remnawave 3.4+): EXCLUDE hides the host from the squads listed in internal_squads; ALLOW_ONLY shows the host only in those squads. Defaults to EXCLUDE when internal_squads is configured without an explicit mode.'
             is_disabled: (Boolean) Whether the host is disabled.
             is_hidden: (Boolean) Hide host from subscription.
             keep_sni_blank: (Boolean) Keep SNI blank instead of deriving it.
+            mapper: (String) Per-client host mapper operations as JSON (Remnawave 3.3+). Supports xrayJson, mihomo, base64, and singbox operation arrays.
             mihomo_ip_version: (String) Mihomo IP version preference.
             mihomo_x25519: (Boolean) Enable Mihomo X25519 proxy.
             mux_params: (String) Mux parameters as JSON.
@@ -345,6 +348,7 @@ resources:
             country_code: (String) ISO 3166-1 alpha-2 country code (2 chars).
             created_at: (String) Creation timestamp.
             id: (Number) Numeric database ID of the node (available on Remnawave 3.1+).
+            integration_uuids: (Set of String) Node integration UUIDs (Remnawave 3.3+, up to 20). Changing this set force-restarts the active node profile.
             ip: (String) IPv4 or IPv6 address.
             ips: (Attributes Set) IP addresses assigned to the node and their traffic roles (Remnawave 3.2.2+, up to 64). (see below for nested schema)
             is_connected: (Boolean) Whether the node is currently connected.
@@ -434,6 +438,30 @@ resources:
             triggers: (Map of String) A map of arbitrary key/value pairs. When any value changes, the resource is re-applied and the action re-executed.
             uuids: (List of String) List of node UUIDs to operate on.
         importStatements: []
+    remnawave_node_integration:
+        subCategory: ""
+        description: Manages a Remnawave 3.3+ node integration.
+        name: remnawave_node_integration
+        title: remnawave_node_integration Resource - terraform-provider-remnawave
+        examples:
+            - name: environment
+              manifest: |-
+                {
+                  "config": "${jsonencode({\n    environmentVariables = {\n      XRAY_LOCATION_ASSET = \"/usr/local/share/xray\"\n    }\n  })}",
+                  "description": "Environment values injected into assigned nodes",
+                  "name": "Common node environment",
+                  "restart_nodes_on_update": true
+                }
+        argumentDocs:
+            config: (String, Sensitive) Integration configuration as a JSON object. The structure is consumed by Remnawave and the node.
+            description: (String) Optional integration description (max 255 chars).
+            name: (String) Integration name (2-30 chars).
+            restart_nodes_on_update: (Boolean) Force-restart affected nodes after updating the integration. Defaults to false; the preference is retained in Terraform state but is not persisted by Remnawave.
+            uuid: (String) UUID of the node integration.
+        importStatements:
+            - |-
+              # Import a Remnawave 3.3+ node integration by UUID.
+              terraform import remnawave_node_integration.environment 00000000-0000-0000-0000-000000000000
     remnawave_node_metadata:
         subCategory: ""
         description: Manages free-form metadata for a Remnawave node. Metadata is upserted (PUT); there is no DELETE — clear it by setting metadata to {}.
@@ -466,11 +494,23 @@ resources:
               manifest: |-
                 {
                   "name": "Pre-Start Cleanup",
-                  "plugin_config": "${jsonencode({\n    sharedLists = []\n    preStart = {\n      enabled = true\n      cleanupSockets = {\n        enabled = true\n        files   = [\"/dev/shm/*.sock\"]\n      }\n    }\n  })}"
+                  "plugin_config": "${jsonencode({\n    preStart = {\n      enabled = true\n      cleanupSockets = {\n        enabled = true\n        files   = [\"/dev/shm/*.sock\"]\n      }\n    }\n  })}"
+                }
+            - name: torrent_blocker
+              manifest: |-
+                {
+                  "name": "Torrent Blocker",
+                  "plugin_config": "${jsonencode({\n    torrentBlocker = {\n      enabled       = false\n      blockDuration = 3600\n      ignoreLists = {\n        # Plain addresses only; the backend rejects CIDR ranges here.\n        ip = [\"203.0.113.10\"]\n      }\n      # Position of the injected routing rule (0-1000).\n      # Requires Remnawave 3.3.1 or later.\n      rulePlacement = 0\n    }\n  })}"
+                }
+            - name: post_start
+              manifest: |-
+                {
+                  "name": "Post-Start Webhook",
+                  "plugin_config": "${jsonencode({\n    postStart = {\n      enabled = true\n      webhook = {\n        enabled = true\n        url     = \"https://example.com/xray-core-started\"\n      }\n    }\n  })}"
                 }
         argumentDocs:
             name: (String) Plugin name (2-30 chars).
-            plugin_config: (String) Plugin config as JSON. Supported keys are sharedLists, torrentBlocker, ingressFilter, egressFilter, connectionDrop, and preStart (Remnawave 3.1+).
+            plugin_config: (String) Plugin config as JSON. Supported keys are sharedLists, torrentBlocker, ingressFilter, egressFilter, connectionDrop, preStart (Remnawave 3.1+), and postStart (Remnawave 3.4.5+). On Remnawave 3.3+, sharedLists is read as an effective compatibility view and omitted from plugin writes; manage global list contents with remnawave_shared_list. The torrentBlocker object accepts rulePlacement (0-1000) on Remnawave 3.3.1+ to position the injected routing rule; Remnawave 3.3.1 returns a default of 0 for that key, which the provider drops unless the configuration sets it. The postStart object accepts enabled and an optional webhook ({enabled, url}, where url must be a valid http(s) URL) fired after Xray-core starts or restarts; Remnawave 3.4.5 returns a default of false for postStart.enabled when the configuration omits it, which the provider drops unless the configuration sets it.
             uuid: (String)
         importStatements:
             - |-
@@ -516,6 +556,31 @@ resources:
             - |-
               # Import an existing passkey by its UUID.
               terraform import remnawave_passkey.laptop 00000000-0000-0000-0000-000000000000
+    remnawave_shared_list:
+        subCategory: ""
+        description: Manages a global Remnawave 3.3+ node-plugin shared list.
+        name: remnawave_shared_list
+        title: remnawave_shared_list Resource - terraform-provider-remnawave
+        examples:
+            - name: private_ranges
+              manifest: |-
+                {
+                  "config": "${jsonencode({\n    type  = \"ipList\"\n    items = [\"10.0.0.0/8\", \"172.16.0.0/12\", \"192.168.0.0/16\"]\n  })}",
+                  "name": "private_ranges"
+                }
+            - name: grouped_ranges
+              manifest: |-
+                {
+                  "config": "${jsonencode({\n    type  = \"ipList\"\n    items = [\"100.64.0.0/10\", \"192.0.2.0/24\"]\n  })}",
+                  "name": "terraform/bogons"
+                }
+        argumentDocs:
+            config: '(String) Shared-list configuration as JSON: an ipList with IP/CIDR items or an asList with numeric ASN items.'
+            name: '(String) Shared-list name without the ext: prefix (2-255 letters, numbers, underscores, dashes, and single slashes between segments; slashes require Remnawave 3.4+).'
+        importStatements:
+            - |-
+              # Import a Remnawave 3.3+ global shared list by name (without ext:).
+              terraform import remnawave_shared_list.private_ranges private_ranges
     remnawave_snippet:
         subCategory: ""
         description: Manages a Remnawave Xray config snippet (keyed by name).
@@ -531,6 +596,8 @@ resources:
         argumentDocs:
             name: (String) Snippet name (2-255 chars).
             snippet: (String) Snippet content as JSON array string.
+            sync_nodes_on_change: (Boolean) Restart nodes using config profiles that reference this snippet after update or deletion. Requires Remnawave 3.2.3+, system:metadata (or broader system:read) for version detection, and snippets:sync in addition to the snippets:list/create/update/delete scopes used by normal resource lifecycle operations. Defaults to false because synchronization is disruptive.
+            sync_pending: '(String) Provider-managed recovery phase: none, update, delete, or recreate. A pending phase means an opt-in mutation may have reached the backend but node synchronization did not complete. Refresh remains read-only and preserves a reachable sync-only plan; recovery is at-least-once, so an ambiguous transport failure can cause a duplicate restart.'
         importStatements:
             - |-
               # Import a snippet by name.

@@ -93,8 +93,9 @@ spec:
                       ISO 3166-1 alpha-2 country code (2 chars).
                     type: string
                   integrationUuids:
-                    description: Node integration UUIDs (Remnawave 3.3+, up to 20).
-                      Changing this set force-restarts the active node profile.
+                    description: |-
+                      restarts the active node profile.
+                      Node integration UUIDs (Remnawave 3.3+, up to 20). Changing this set force-restarts the active node profile.
                     items:
                       type: string
                     type: array
@@ -232,8 +233,9 @@ spec:
                       ISO 3166-1 alpha-2 country code (2 chars).
                     type: string
                   integrationUuids:
-                    description: Node integration UUIDs (Remnawave 3.3+, up to 20).
-                      Changing this set force-restarts the active node profile.
+                    description: |-
+                      restarts the active node profile.
+                      Node integration UUIDs (Remnawave 3.3+, up to 20). Changing this set force-restarts the active node profile.
                     items:
                       type: string
                     type: array
@@ -443,8 +445,9 @@ spec:
                       on Remnawave 3.1+).
                     type: string
                   integrationUuids:
-                    description: Node integration UUIDs (Remnawave 3.3+, up to 20).
-                      Changing this set force-restarts the active node profile.
+                    description: |-
+                      restarts the active node profile.
+                      Node integration UUIDs (Remnawave 3.3+, up to 20). Changing this set force-restarts the active node profile.
                     items:
                       type: string
                     type: array

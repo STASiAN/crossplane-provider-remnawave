@@ -89,7 +89,7 @@ spec:
                     x-kubernetes-list-type: set
                   excludedInternalSquads:
                     description: |-
-                      (List of String) Internal squad UUIDs from which this host is excluded.
+                      (List of String, Deprecated) Internal squad UUIDs from which this host is excluded.
                       Internal squad UUIDs from which this host is excluded.
                     items:
                       type: string
@@ -110,18 +110,16 @@ spec:
                       Host header for HTTP/WebSocket.
                     type: string
                   internalSquads:
-                    description: Internal squad UUIDs the internal_squads_mode applies
-                      to (Remnawave 3.4+). An empty list means "exclude none" and
-                      is not allowed with ALLOW_ONLY.
+                    description: |-
+                      (List of String) Internal squad UUIDs the internal_squads_mode applies to (Remnawave 3.4+). An empty list means "exclude none" and is not allowed with ALLOW_ONLY.
+                      Internal squad UUIDs the internal_squads_mode applies to (Remnawave 3.4+). An empty list means "exclude none" and is not allowed with ALLOW_ONLY.
                     items:
                       type: string
                     type: array
                   internalSquadsMode:
-                    description: 'Internal squad selection mode (Remnawave 3.4+):
-                      EXCLUDE hides the host from the squads listed in internal_squads;
-                      ALLOW_ONLY shows the host only in those squads. Defaults to
-                      EXCLUDE when internal_squads is configured without an explicit
-                      mode.'
+                    description: |-
+                      (String) Internal squad selection mode (Remnawave 3.4+): EXCLUDE hides the host from the squads listed in internal_squads; ALLOW_ONLY shows the host only in those squads. Defaults to EXCLUDE when internal_squads is configured without an explicit mode.
+                      Internal squad selection mode (Remnawave 3.4+): EXCLUDE hides the host from the squads listed in internal_squads; ALLOW_ONLY shows the host only in those squads. Defaults to EXCLUDE when internal_squads is configured without an explicit mode.
                     type: string
                   isDisabled:
                     description: |-
@@ -139,9 +137,9 @@ spec:
                       Keep SNI blank instead of deriving it.
                     type: boolean
                   mapper:
-                    description: Per-client host mapper operations as JSON (Remnawave
-                      3.3+). Supports xrayJson, mihomo, base64, and singbox operation
-                      arrays.
+                    description: |-
+                      client host mapper operations as JSON (Remnawave 3.3+). Supports xrayJson, mihomo, base64, and singbox operation arrays.
+                      Per-client host mapper operations as JSON (Remnawave 3.3+). Supports xrayJson, mihomo, base64, and singbox operation arrays.
                     type: string
                   mihomoIpVersion:
                     description: |-
@@ -286,7 +284,7 @@ spec:
                     x-kubernetes-list-type: set
                   excludedInternalSquads:
                     description: |-
-                      (List of String) Internal squad UUIDs from which this host is excluded.
+                      (List of String, Deprecated) Internal squad UUIDs from which this host is excluded.
                       Internal squad UUIDs from which this host is excluded.
                     items:
                       type: string
@@ -307,18 +305,16 @@ spec:
                       Host header for HTTP/WebSocket.
                     type: string
                   internalSquads:
-                    description: Internal squad UUIDs the internal_squads_mode applies
-                      to (Remnawave 3.4+). An empty list means "exclude none" and
-                      is not allowed with ALLOW_ONLY.
+                    description: |-
+                      (List of String) Internal squad UUIDs the internal_squads_mode applies to (Remnawave 3.4+). An empty list means "exclude none" and is not allowed with ALLOW_ONLY.
+                      Internal squad UUIDs the internal_squads_mode applies to (Remnawave 3.4+). An empty list means "exclude none" and is not allowed with ALLOW_ONLY.
                     items:
                       type: string
                     type: array
                   internalSquadsMode:
-                    description: 'Internal squad selection mode (Remnawave 3.4+):
-                      EXCLUDE hides the host from the squads listed in internal_squads;
-                      ALLOW_ONLY shows the host only in those squads. Defaults to
-                      EXCLUDE when internal_squads is configured without an explicit
-                      mode.'
+                    description: |-
+                      (String) Internal squad selection mode (Remnawave 3.4+): EXCLUDE hides the host from the squads listed in internal_squads; ALLOW_ONLY shows the host only in those squads. Defaults to EXCLUDE when internal_squads is configured without an explicit mode.
+                      Internal squad selection mode (Remnawave 3.4+): EXCLUDE hides the host from the squads listed in internal_squads; ALLOW_ONLY shows the host only in those squads. Defaults to EXCLUDE when internal_squads is configured without an explicit mode.
                     type: string
                   isDisabled:
                     description: |-
@@ -336,9 +332,9 @@ spec:
                       Keep SNI blank instead of deriving it.
                     type: boolean
                   mapper:
-                    description: Per-client host mapper operations as JSON (Remnawave
-                      3.3+). Supports xrayJson, mihomo, base64, and singbox operation
-                      arrays.
+                    description: |-
+                      client host mapper operations as JSON (Remnawave 3.3+). Supports xrayJson, mihomo, base64, and singbox operation arrays.
+                      Per-client host mapper operations as JSON (Remnawave 3.3+). Supports xrayJson, mihomo, base64, and singbox operation arrays.
                     type: string
                   mihomoIpVersion:
                     description: |-
@@ -554,7 +550,7 @@ spec:
                     x-kubernetes-list-type: set
                   excludedInternalSquads:
                     description: |-
-                      (List of String) Internal squad UUIDs from which this host is excluded.
+                      (List of String, Deprecated) Internal squad UUIDs from which this host is excluded.
                       Internal squad UUIDs from which this host is excluded.
                     items:
                       type: string
@@ -577,18 +573,16 @@ spec:
                   id:
                     type: string
                   internalSquads:
-                    description: Internal squad UUIDs the internal_squads_mode applies
-                      to (Remnawave 3.4+). An empty list means "exclude none" and
-                      is not allowed with ALLOW_ONLY.
+                    description: |-
+                      (List of String) Internal squad UUIDs the internal_squads_mode applies to (Remnawave 3.4+). An empty list means "exclude none" and is not allowed with ALLOW_ONLY.
+                      Internal squad UUIDs the internal_squads_mode applies to (Remnawave 3.4+). An empty list means "exclude none" and is not allowed with ALLOW_ONLY.
                     items:
                       type: string
                     type: array
                   internalSquadsMode:
-                    description: 'Internal squad selection mode (Remnawave 3.4+):
-                      EXCLUDE hides the host from the squads listed in internal_squads;
-                      ALLOW_ONLY shows the host only in those squads. Defaults to
-                      EXCLUDE when internal_squads is configured without an explicit
-                      mode.'
+                    description: |-
+                      (String) Internal squad selection mode (Remnawave 3.4+): EXCLUDE hides the host from the squads listed in internal_squads; ALLOW_ONLY shows the host only in those squads. Defaults to EXCLUDE when internal_squads is configured without an explicit mode.
+                      Internal squad selection mode (Remnawave 3.4+): EXCLUDE hides the host from the squads listed in internal_squads; ALLOW_ONLY shows the host only in those squads. Defaults to EXCLUDE when internal_squads is configured without an explicit mode.
                     type: string
                   isDisabled:
                     description: |-
@@ -606,9 +600,9 @@ spec:
                       Keep SNI blank instead of deriving it.
                     type: boolean
                   mapper:
-                    description: Per-client host mapper operations as JSON (Remnawave
-                      3.3+). Supports xrayJson, mihomo, base64, and singbox operation
-                      arrays.
+                    description: |-
+                      client host mapper operations as JSON (Remnawave 3.3+). Supports xrayJson, mihomo, base64, and singbox operation arrays.
+                      Per-client host mapper operations as JSON (Remnawave 3.3+). Supports xrayJson, mihomo, base64, and singbox operation arrays.
                     type: string
                   mihomoIpVersion:
                     description: |-

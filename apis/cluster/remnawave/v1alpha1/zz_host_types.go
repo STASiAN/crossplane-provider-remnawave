@@ -36,7 +36,7 @@ type HostInitParameters struct {
 	// +listType=set
 	ExcludeFromSubscriptionTypes []*string `json:"excludeFromSubscriptionTypes,omitempty" tf:"exclude_from_subscription_types,omitempty"`
 
-	// (List of String) Internal squad UUIDs from which this host is excluded.
+	// (List of String, Deprecated) Internal squad UUIDs from which this host is excluded.
 	// Internal squad UUIDs from which this host is excluded.
 	ExcludedInternalSquads []*string `json:"excludedInternalSquads,omitempty" tf:"excluded_internal_squads,omitempty"`
 
@@ -52,9 +52,11 @@ type HostInitParameters struct {
 	// Host header for HTTP/WebSocket.
 	HostHeader *string `json:"hostHeader,omitempty" tf:"host_header,omitempty"`
 
+	// (List of String) Internal squad UUIDs the internal_squads_mode applies to (Remnawave 3.4+). An empty list means "exclude none" and is not allowed with ALLOW_ONLY.
 	// Internal squad UUIDs the internal_squads_mode applies to (Remnawave 3.4+). An empty list means "exclude none" and is not allowed with ALLOW_ONLY.
 	InternalSquads []*string `json:"internalSquads,omitempty" tf:"internal_squads,omitempty"`
 
+	// (String) Internal squad selection mode (Remnawave 3.4+): EXCLUDE hides the host from the squads listed in internal_squads; ALLOW_ONLY shows the host only in those squads. Defaults to EXCLUDE when internal_squads is configured without an explicit mode.
 	// Internal squad selection mode (Remnawave 3.4+): EXCLUDE hides the host from the squads listed in internal_squads; ALLOW_ONLY shows the host only in those squads. Defaults to EXCLUDE when internal_squads is configured without an explicit mode.
 	InternalSquadsMode *string `json:"internalSquadsMode,omitempty" tf:"internal_squads_mode,omitempty"`
 
@@ -70,6 +72,7 @@ type HostInitParameters struct {
 	// Keep SNI blank instead of deriving it.
 	KeepSniBlank *bool `json:"keepSniBlank,omitempty" tf:"keep_sni_blank,omitempty"`
 
+	// client host mapper operations as JSON (Remnawave 3.3+). Supports xrayJson, mihomo, base64, and singbox operation arrays.
 	// Per-client host mapper operations as JSON (Remnawave 3.3+). Supports xrayJson, mihomo, base64, and singbox operation arrays.
 	Mapper *string `json:"mapper,omitempty" tf:"mapper,omitempty"`
 
@@ -173,7 +176,7 @@ type HostObservation struct {
 	// +listType=set
 	ExcludeFromSubscriptionTypes []*string `json:"excludeFromSubscriptionTypes,omitempty" tf:"exclude_from_subscription_types,omitempty"`
 
-	// (List of String) Internal squad UUIDs from which this host is excluded.
+	// (List of String, Deprecated) Internal squad UUIDs from which this host is excluded.
 	// Internal squad UUIDs from which this host is excluded.
 	ExcludedInternalSquads []*string `json:"excludedInternalSquads,omitempty" tf:"excluded_internal_squads,omitempty"`
 
@@ -191,9 +194,11 @@ type HostObservation struct {
 
 	ID *string `json:"id,omitempty" tf:"id,omitempty"`
 
+	// (List of String) Internal squad UUIDs the internal_squads_mode applies to (Remnawave 3.4+). An empty list means "exclude none" and is not allowed with ALLOW_ONLY.
 	// Internal squad UUIDs the internal_squads_mode applies to (Remnawave 3.4+). An empty list means "exclude none" and is not allowed with ALLOW_ONLY.
 	InternalSquads []*string `json:"internalSquads,omitempty" tf:"internal_squads,omitempty"`
 
+	// (String) Internal squad selection mode (Remnawave 3.4+): EXCLUDE hides the host from the squads listed in internal_squads; ALLOW_ONLY shows the host only in those squads. Defaults to EXCLUDE when internal_squads is configured without an explicit mode.
 	// Internal squad selection mode (Remnawave 3.4+): EXCLUDE hides the host from the squads listed in internal_squads; ALLOW_ONLY shows the host only in those squads. Defaults to EXCLUDE when internal_squads is configured without an explicit mode.
 	InternalSquadsMode *string `json:"internalSquadsMode,omitempty" tf:"internal_squads_mode,omitempty"`
 
@@ -209,6 +214,7 @@ type HostObservation struct {
 	// Keep SNI blank instead of deriving it.
 	KeepSniBlank *bool `json:"keepSniBlank,omitempty" tf:"keep_sni_blank,omitempty"`
 
+	// client host mapper operations as JSON (Remnawave 3.3+). Supports xrayJson, mihomo, base64, and singbox operation arrays.
 	// Per-client host mapper operations as JSON (Remnawave 3.3+). Supports xrayJson, mihomo, base64, and singbox operation arrays.
 	Mapper *string `json:"mapper,omitempty" tf:"mapper,omitempty"`
 
@@ -321,7 +327,7 @@ type HostParameters struct {
 	// +listType=set
 	ExcludeFromSubscriptionTypes []*string `json:"excludeFromSubscriptionTypes,omitempty" tf:"exclude_from_subscription_types,omitempty"`
 
-	// (List of String) Internal squad UUIDs from which this host is excluded.
+	// (List of String, Deprecated) Internal squad UUIDs from which this host is excluded.
 	// Internal squad UUIDs from which this host is excluded.
 	// +kubebuilder:validation:Optional
 	ExcludedInternalSquads []*string `json:"excludedInternalSquads,omitempty" tf:"excluded_internal_squads,omitempty"`
@@ -341,10 +347,12 @@ type HostParameters struct {
 	// +kubebuilder:validation:Optional
 	HostHeader *string `json:"hostHeader,omitempty" tf:"host_header,omitempty"`
 
+	// (List of String) Internal squad UUIDs the internal_squads_mode applies to (Remnawave 3.4+). An empty list means "exclude none" and is not allowed with ALLOW_ONLY.
 	// Internal squad UUIDs the internal_squads_mode applies to (Remnawave 3.4+). An empty list means "exclude none" and is not allowed with ALLOW_ONLY.
 	// +kubebuilder:validation:Optional
 	InternalSquads []*string `json:"internalSquads,omitempty" tf:"internal_squads,omitempty"`
 
+	// (String) Internal squad selection mode (Remnawave 3.4+): EXCLUDE hides the host from the squads listed in internal_squads; ALLOW_ONLY shows the host only in those squads. Defaults to EXCLUDE when internal_squads is configured without an explicit mode.
 	// Internal squad selection mode (Remnawave 3.4+): EXCLUDE hides the host from the squads listed in internal_squads; ALLOW_ONLY shows the host only in those squads. Defaults to EXCLUDE when internal_squads is configured without an explicit mode.
 	// +kubebuilder:validation:Optional
 	InternalSquadsMode *string `json:"internalSquadsMode,omitempty" tf:"internal_squads_mode,omitempty"`
@@ -364,6 +372,7 @@ type HostParameters struct {
 	// +kubebuilder:validation:Optional
 	KeepSniBlank *bool `json:"keepSniBlank,omitempty" tf:"keep_sni_blank,omitempty"`
 
+	// client host mapper operations as JSON (Remnawave 3.3+). Supports xrayJson, mihomo, base64, and singbox operation arrays.
 	// Per-client host mapper operations as JSON (Remnawave 3.3+). Supports xrayJson, mihomo, base64, and singbox operation arrays.
 	// +kubebuilder:validation:Optional
 	Mapper *string `json:"mapper,omitempty" tf:"mapper,omitempty"`

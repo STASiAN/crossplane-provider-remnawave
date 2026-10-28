@@ -70,12 +70,9 @@ spec:
                       Snippet content as JSON array string.
                     type: string
                   syncNodesOnChange:
-                    description: Restart nodes using config profiles that reference
-                      this snippet after update or deletion. Requires Remnawave 3.2.3+,
-                      system:metadata (or broader system:read) for version detection,
-                      and snippets:sync in addition to the snippets:list/create/update/delete
-                      scopes used by normal resource lifecycle operations. Defaults
-                      to false because synchronization is disruptive.
+                    description: |-
+                      (Boolean) Restart nodes using config profiles that reference this snippet after update or deletion. Requires Remnawave 3.2.3+, system:metadata (or broader system:read) for version detection, and snippets:sync in addition to the snippets:list/create/update/delete scopes used by normal resource lifecycle operations. Defaults to false because synchronization is disruptive.
+                      Restart nodes using config profiles that reference this snippet after update or deletion. Requires Remnawave 3.2.3+, system:metadata (or broader system:read) for version detection, and snippets:sync in addition to the snippets:list/create/update/delete scopes used by normal resource lifecycle operations. Defaults to false because synchronization is disruptive.
                     type: boolean
                 type: object
               initProvider:
@@ -102,12 +99,9 @@ spec:
                       Snippet content as JSON array string.
                     type: string
                   syncNodesOnChange:
-                    description: Restart nodes using config profiles that reference
-                      this snippet after update or deletion. Requires Remnawave 3.2.3+,
-                      system:metadata (or broader system:read) for version detection,
-                      and snippets:sync in addition to the snippets:list/create/update/delete
-                      scopes used by normal resource lifecycle operations. Defaults
-                      to false because synchronization is disruptive.
+                    description: |-
+                      (Boolean) Restart nodes using config profiles that reference this snippet after update or deletion. Requires Remnawave 3.2.3+, system:metadata (or broader system:read) for version detection, and snippets:sync in addition to the snippets:list/create/update/delete scopes used by normal resource lifecycle operations. Defaults to false because synchronization is disruptive.
+                      Restart nodes using config profiles that reference this snippet after update or deletion. Requires Remnawave 3.2.3+, system:metadata (or broader system:read) for version detection, and snippets:sync in addition to the snippets:list/create/update/delete scopes used by normal resource lifecycle operations. Defaults to false because synchronization is disruptive.
                     type: boolean
                 type: object
               managementPolicies:
@@ -195,20 +189,14 @@ spec:
                       Snippet content as JSON array string.
                     type: string
                   syncNodesOnChange:
-                    description: Restart nodes using config profiles that reference
-                      this snippet after update or deletion. Requires Remnawave 3.2.3+,
-                      system:metadata (or broader system:read) for version detection,
-                      and snippets:sync in addition to the snippets:list/create/update/delete
-                      scopes used by normal resource lifecycle operations. Defaults
-                      to false because synchronization is disruptive.
+                    description: |-
+                      (Boolean) Restart nodes using config profiles that reference this snippet after update or deletion. Requires Remnawave 3.2.3+, system:metadata (or broader system:read) for version detection, and snippets:sync in addition to the snippets:list/create/update/delete scopes used by normal resource lifecycle operations. Defaults to false because synchronization is disruptive.
+                      Restart nodes using config profiles that reference this snippet after update or deletion. Requires Remnawave 3.2.3+, system:metadata (or broader system:read) for version detection, and snippets:sync in addition to the snippets:list/create/update/delete scopes used by normal resource lifecycle operations. Defaults to false because synchronization is disruptive.
                     type: boolean
                   syncPending:
-                    description: 'Provider-managed recovery phase: none, update, delete,
-                      or recreate. A pending phase means an opt-in mutation may have
-                      reached the backend but node synchronization did not complete.
-                      Refresh remains read-only and preserves a reachable sync-only
-                      plan; recovery is at-least-once, so an ambiguous transport failure
-                      can cause a duplicate restart.'
+                    description: |-
+                      managed recovery phase: none, update, delete, or recreate. A pending phase means an opt-in mutation may have reached the backend but node synchronization did not complete. Refresh remains read-only and preserves a reachable sync-only plan; recovery is at-least-once, so an ambiguous transport failure can cause a duplicate restart.
+                      Provider-managed recovery phase: none, update, delete, or recreate. A pending phase means an opt-in mutation may have reached the backend but node synchronization did not complete. Refresh remains read-only and preserves a reachable sync-only plan; recovery is at-least-once, so an ambiguous transport failure can cause a duplicate restart.
                     type: string
                 type: object
               conditions:

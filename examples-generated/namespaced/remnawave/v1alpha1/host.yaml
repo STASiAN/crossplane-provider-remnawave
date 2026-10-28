@@ -12,6 +12,11 @@ spec:
     address: vpn.example.com
     configProfileInboundUuid: ${remnawave_config_profile.default.inbounds[0].uuid}
     configProfileUuid: ${remnawave_config_profile.default.uuid}
+    mapper: |-
+      ${jsonencode({
+          mihomo  = [{ op = "set", to = "tfo", value = true }]
+          singbox = [{ op = "set", to = "tcp_fast_open", value = true }]
+        })}
     port: 443
     remark: "\U0001F1E9\U0001F1EA Frankfurt"
     tags:

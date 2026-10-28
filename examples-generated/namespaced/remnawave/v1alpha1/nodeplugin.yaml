@@ -12,7 +12,6 @@ spec:
     name: Pre-Start Cleanup
     pluginConfig: |-
       ${jsonencode({
-          sharedLists = []
           preStart = {
             enabled = true
             cleanupSockets = {
