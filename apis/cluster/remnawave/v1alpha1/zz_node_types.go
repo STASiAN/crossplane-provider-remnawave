@@ -75,6 +75,10 @@ type NodeInitParameters struct {
 	// ISO 3166-1 alpha-2 country code (2 chars).
 	CountryCode *string `json:"countryCode,omitempty" tf:"country_code,omitempty"`
 
+	// Node integration UUIDs (Remnawave 3.3+, up to 20). Changing this set force-restarts the active node profile.
+	// +listType=set
+	IntegrationUuids []*string `json:"integrationUuids,omitempty" tf:"integration_uuids,omitempty"`
+
 	// (Attributes Set) IP addresses assigned to the node and their traffic roles (Remnawave 3.2.2+, up to 64). (see below for nested schema)
 	Ips []IpsInitParameters `json:"ips,omitempty" tf:"ips,omitempty"`
 
@@ -157,6 +161,10 @@ type NodeObservation struct {
 
 	// (Number) Numeric database ID of the node (available on Remnawave 3.1+).
 	ID *string `json:"id,omitempty" tf:"id,omitempty"`
+
+	// Node integration UUIDs (Remnawave 3.3+, up to 20). Changing this set force-restarts the active node profile.
+	// +listType=set
+	IntegrationUuids []*string `json:"integrationUuids,omitempty" tf:"integration_uuids,omitempty"`
 
 	// (Attributes Set) IP addresses assigned to the node and their traffic roles (Remnawave 3.2.2+, up to 64). (see below for nested schema)
 	Ips []IpsObservation `json:"ips,omitempty" tf:"ips,omitempty"`
@@ -291,6 +299,11 @@ type NodeParameters struct {
 	// ISO 3166-1 alpha-2 country code (2 chars).
 	// +kubebuilder:validation:Optional
 	CountryCode *string `json:"countryCode,omitempty" tf:"country_code,omitempty"`
+
+	// Node integration UUIDs (Remnawave 3.3+, up to 20). Changing this set force-restarts the active node profile.
+	// +kubebuilder:validation:Optional
+	// +listType=set
+	IntegrationUuids []*string `json:"integrationUuids,omitempty" tf:"integration_uuids,omitempty"`
 
 	// (Attributes Set) IP addresses assigned to the node and their traffic roles (Remnawave 3.2.2+, up to 64). (see below for nested schema)
 	// +kubebuilder:validation:Optional

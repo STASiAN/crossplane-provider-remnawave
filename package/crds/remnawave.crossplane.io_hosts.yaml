@@ -123,6 +123,20 @@ spec:
                       (String) Host header for HTTP/WebSocket.
                       Host header for HTTP/WebSocket.
                     type: string
+                  internalSquads:
+                    description: Internal squad UUIDs the internal_squads_mode applies
+                      to (Remnawave 3.4+). An empty list means "exclude none" and
+                      is not allowed with ALLOW_ONLY.
+                    items:
+                      type: string
+                    type: array
+                  internalSquadsMode:
+                    description: 'Internal squad selection mode (Remnawave 3.4+):
+                      EXCLUDE hides the host from the squads listed in internal_squads;
+                      ALLOW_ONLY shows the host only in those squads. Defaults to
+                      EXCLUDE when internal_squads is configured without an explicit
+                      mode.'
+                    type: string
                   isDisabled:
                     description: |-
                       (Boolean) Whether the host is disabled.
@@ -138,6 +152,11 @@ spec:
                       (Boolean) Keep SNI blank instead of deriving it.
                       Keep SNI blank instead of deriving it.
                     type: boolean
+                  mapper:
+                    description: Per-client host mapper operations as JSON (Remnawave
+                      3.3+). Supports xrayJson, mihomo, base64, and singbox operation
+                      arrays.
+                    type: string
                   mihomoIpVersion:
                     description: |-
                       (String) Mihomo IP version preference.
@@ -301,6 +320,20 @@ spec:
                       (String) Host header for HTTP/WebSocket.
                       Host header for HTTP/WebSocket.
                     type: string
+                  internalSquads:
+                    description: Internal squad UUIDs the internal_squads_mode applies
+                      to (Remnawave 3.4+). An empty list means "exclude none" and
+                      is not allowed with ALLOW_ONLY.
+                    items:
+                      type: string
+                    type: array
+                  internalSquadsMode:
+                    description: 'Internal squad selection mode (Remnawave 3.4+):
+                      EXCLUDE hides the host from the squads listed in internal_squads;
+                      ALLOW_ONLY shows the host only in those squads. Defaults to
+                      EXCLUDE when internal_squads is configured without an explicit
+                      mode.'
+                    type: string
                   isDisabled:
                     description: |-
                       (Boolean) Whether the host is disabled.
@@ -316,6 +349,11 @@ spec:
                       (Boolean) Keep SNI blank instead of deriving it.
                       Keep SNI blank instead of deriving it.
                     type: boolean
+                  mapper:
+                    description: Per-client host mapper operations as JSON (Remnawave
+                      3.3+). Supports xrayJson, mihomo, base64, and singbox operation
+                      arrays.
+                    type: string
                   mihomoIpVersion:
                     description: |-
                       (String) Mihomo IP version preference.
@@ -580,6 +618,20 @@ spec:
                     type: string
                   id:
                     type: string
+                  internalSquads:
+                    description: Internal squad UUIDs the internal_squads_mode applies
+                      to (Remnawave 3.4+). An empty list means "exclude none" and
+                      is not allowed with ALLOW_ONLY.
+                    items:
+                      type: string
+                    type: array
+                  internalSquadsMode:
+                    description: 'Internal squad selection mode (Remnawave 3.4+):
+                      EXCLUDE hides the host from the squads listed in internal_squads;
+                      ALLOW_ONLY shows the host only in those squads. Defaults to
+                      EXCLUDE when internal_squads is configured without an explicit
+                      mode.'
+                    type: string
                   isDisabled:
                     description: |-
                       (Boolean) Whether the host is disabled.
@@ -595,6 +647,11 @@ spec:
                       (Boolean) Keep SNI blank instead of deriving it.
                       Keep SNI blank instead of deriving it.
                     type: boolean
+                  mapper:
+                    description: Per-client host mapper operations as JSON (Remnawave
+                      3.3+). Supports xrayJson, mihomo, base64, and singbox operation
+                      arrays.
+                    type: string
                   mihomoIpVersion:
                     description: |-
                       (String) Mihomo IP version preference.

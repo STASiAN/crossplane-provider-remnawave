@@ -22,6 +22,9 @@ type SnippetInitParameters struct {
 	// (String) Snippet content as JSON array string.
 	// Snippet content as JSON array string.
 	Snippet *string `json:"snippet,omitempty" tf:"snippet,omitempty"`
+
+	// Restart nodes using config profiles that reference this snippet after update or deletion. Requires Remnawave 3.2.3+, system:metadata (or broader system:read) for version detection, and snippets:sync in addition to the snippets:list/create/update/delete scopes used by normal resource lifecycle operations. Defaults to false because synchronization is disruptive.
+	SyncNodesOnChange *bool `json:"syncNodesOnChange,omitempty" tf:"sync_nodes_on_change,omitempty"`
 }
 
 type SnippetObservation struct {
@@ -34,6 +37,12 @@ type SnippetObservation struct {
 	// (String) Snippet content as JSON array string.
 	// Snippet content as JSON array string.
 	Snippet *string `json:"snippet,omitempty" tf:"snippet,omitempty"`
+
+	// Restart nodes using config profiles that reference this snippet after update or deletion. Requires Remnawave 3.2.3+, system:metadata (or broader system:read) for version detection, and snippets:sync in addition to the snippets:list/create/update/delete scopes used by normal resource lifecycle operations. Defaults to false because synchronization is disruptive.
+	SyncNodesOnChange *bool `json:"syncNodesOnChange,omitempty" tf:"sync_nodes_on_change,omitempty"`
+
+	// Provider-managed recovery phase: none, update, delete, or recreate. A pending phase means an opt-in mutation may have reached the backend but node synchronization did not complete. Refresh remains read-only and preserves a reachable sync-only plan; recovery is at-least-once, so an ambiguous transport failure can cause a duplicate restart.
+	SyncPending *string `json:"syncPending,omitempty" tf:"sync_pending,omitempty"`
 }
 
 type SnippetParameters struct {
@@ -47,6 +56,10 @@ type SnippetParameters struct {
 	// Snippet content as JSON array string.
 	// +kubebuilder:validation:Optional
 	Snippet *string `json:"snippet,omitempty" tf:"snippet,omitempty"`
+
+	// Restart nodes using config profiles that reference this snippet after update or deletion. Requires Remnawave 3.2.3+, system:metadata (or broader system:read) for version detection, and snippets:sync in addition to the snippets:list/create/update/delete scopes used by normal resource lifecycle operations. Defaults to false because synchronization is disruptive.
+	// +kubebuilder:validation:Optional
+	SyncNodesOnChange *bool `json:"syncNodesOnChange,omitempty" tf:"sync_nodes_on_change,omitempty"`
 }
 
 // SnippetSpec defines the desired state of Snippet

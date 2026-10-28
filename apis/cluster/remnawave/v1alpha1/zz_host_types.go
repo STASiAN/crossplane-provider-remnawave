@@ -52,6 +52,12 @@ type HostInitParameters struct {
 	// Host header for HTTP/WebSocket.
 	HostHeader *string `json:"hostHeader,omitempty" tf:"host_header,omitempty"`
 
+	// Internal squad UUIDs the internal_squads_mode applies to (Remnawave 3.4+). An empty list means "exclude none" and is not allowed with ALLOW_ONLY.
+	InternalSquads []*string `json:"internalSquads,omitempty" tf:"internal_squads,omitempty"`
+
+	// Internal squad selection mode (Remnawave 3.4+): EXCLUDE hides the host from the squads listed in internal_squads; ALLOW_ONLY shows the host only in those squads. Defaults to EXCLUDE when internal_squads is configured without an explicit mode.
+	InternalSquadsMode *string `json:"internalSquadsMode,omitempty" tf:"internal_squads_mode,omitempty"`
+
 	// (Boolean) Whether the host is disabled.
 	// Whether the host is disabled.
 	IsDisabled *bool `json:"isDisabled,omitempty" tf:"is_disabled,omitempty"`
@@ -63,6 +69,9 @@ type HostInitParameters struct {
 	// (Boolean) Keep SNI blank instead of deriving it.
 	// Keep SNI blank instead of deriving it.
 	KeepSniBlank *bool `json:"keepSniBlank,omitempty" tf:"keep_sni_blank,omitempty"`
+
+	// Per-client host mapper operations as JSON (Remnawave 3.3+). Supports xrayJson, mihomo, base64, and singbox operation arrays.
+	Mapper *string `json:"mapper,omitempty" tf:"mapper,omitempty"`
 
 	// (String) Mihomo IP version preference.
 	// Mihomo IP version preference.
@@ -182,6 +191,12 @@ type HostObservation struct {
 
 	ID *string `json:"id,omitempty" tf:"id,omitempty"`
 
+	// Internal squad UUIDs the internal_squads_mode applies to (Remnawave 3.4+). An empty list means "exclude none" and is not allowed with ALLOW_ONLY.
+	InternalSquads []*string `json:"internalSquads,omitempty" tf:"internal_squads,omitempty"`
+
+	// Internal squad selection mode (Remnawave 3.4+): EXCLUDE hides the host from the squads listed in internal_squads; ALLOW_ONLY shows the host only in those squads. Defaults to EXCLUDE when internal_squads is configured without an explicit mode.
+	InternalSquadsMode *string `json:"internalSquadsMode,omitempty" tf:"internal_squads_mode,omitempty"`
+
 	// (Boolean) Whether the host is disabled.
 	// Whether the host is disabled.
 	IsDisabled *bool `json:"isDisabled,omitempty" tf:"is_disabled,omitempty"`
@@ -193,6 +208,9 @@ type HostObservation struct {
 	// (Boolean) Keep SNI blank instead of deriving it.
 	// Keep SNI blank instead of deriving it.
 	KeepSniBlank *bool `json:"keepSniBlank,omitempty" tf:"keep_sni_blank,omitempty"`
+
+	// Per-client host mapper operations as JSON (Remnawave 3.3+). Supports xrayJson, mihomo, base64, and singbox operation arrays.
+	Mapper *string `json:"mapper,omitempty" tf:"mapper,omitempty"`
 
 	// (String) Mihomo IP version preference.
 	// Mihomo IP version preference.
@@ -323,6 +341,14 @@ type HostParameters struct {
 	// +kubebuilder:validation:Optional
 	HostHeader *string `json:"hostHeader,omitempty" tf:"host_header,omitempty"`
 
+	// Internal squad UUIDs the internal_squads_mode applies to (Remnawave 3.4+). An empty list means "exclude none" and is not allowed with ALLOW_ONLY.
+	// +kubebuilder:validation:Optional
+	InternalSquads []*string `json:"internalSquads,omitempty" tf:"internal_squads,omitempty"`
+
+	// Internal squad selection mode (Remnawave 3.4+): EXCLUDE hides the host from the squads listed in internal_squads; ALLOW_ONLY shows the host only in those squads. Defaults to EXCLUDE when internal_squads is configured without an explicit mode.
+	// +kubebuilder:validation:Optional
+	InternalSquadsMode *string `json:"internalSquadsMode,omitempty" tf:"internal_squads_mode,omitempty"`
+
 	// (Boolean) Whether the host is disabled.
 	// Whether the host is disabled.
 	// +kubebuilder:validation:Optional
@@ -337,6 +363,10 @@ type HostParameters struct {
 	// Keep SNI blank instead of deriving it.
 	// +kubebuilder:validation:Optional
 	KeepSniBlank *bool `json:"keepSniBlank,omitempty" tf:"keep_sni_blank,omitempty"`
+
+	// Per-client host mapper operations as JSON (Remnawave 3.3+). Supports xrayJson, mihomo, base64, and singbox operation arrays.
+	// +kubebuilder:validation:Optional
+	Mapper *string `json:"mapper,omitempty" tf:"mapper,omitempty"`
 
 	// (String) Mihomo IP version preference.
 	// Mihomo IP version preference.
