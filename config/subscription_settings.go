@@ -11,19 +11,22 @@ import (
 	"github.com/pkg/errors"
 )
 
+// attrCustomResponseHeaders is the Terraform attribute exposed as a map.
+const attrCustomResponseHeaders = "custom_response_headers"
+
 // configureSubscriptionSettings exposes custom_response_headers as a map of
 // header name to value instead of the JSON string the Terraform schema uses,
 // with the Happ routing header as readable JSON (see happRoutingHeader).
 func configureSubscriptionSettings(p *ujconfig.Provider) {
 	p.AddResourceConfigurator("remnawave_subscription_settings", func(r *ujconfig.Resource) {
-		r.TerraformResource.Schema["custom_response_headers"] = &schema.Schema{
+		r.TerraformResource.Schema[attrCustomResponseHeaders] = &schema.Schema{
 			Type:        schema.TypeMap,
 			Optional:    true,
 			Computed:    true,
 			Elem:        &schema.Schema{Type: schema.TypeString},
 			Description: "Headers the panel returns on every subscription fetch, by name.",
 		}
-		r.TerraformConversions = append(r.TerraformConversions, jsonStringMapConversion{"custom_response_headers"})
+		r.TerraformConversions = append(r.TerraformConversions, jsonStringMapConversion{attrCustomResponseHeaders})
 	})
 }
 
@@ -37,36 +40,49 @@ func (c jsonStringMapConversion) Convert(params map[string]any, _ *ujconfig.Reso
 		if !ok || v == nil {
 			continue
 		}
+		var err error
 		switch mode {
 		case ujconfig.ToTerraform:
-			m, ok := v.(map[string]any)
-			if !ok {
-				continue
-			}
-			if err := encodeHappRouting(m); err != nil {
-				return nil, errors.Wrapf(err, "cannot encode %s", k)
-			}
-			s, err := canonicalJSON(m)
-			if err != nil {
-				return nil, errors.Wrapf(err, "cannot encode %s", k)
-			}
-			params[k] = s
+			v, err = headersToTerraform(v)
 		case ujconfig.FromTerraform:
-			s, ok := v.(string)
-			if !ok {
-				continue
-			}
-			m := map[string]any{}
-			if s != "" {
-				if err := json.Unmarshal([]byte(s), &m); err != nil {
-					return nil, errors.Wrapf(err, "cannot decode %s", k)
-				}
-			}
-			decodeHappRouting(m)
-			params[k] = m
+			v, err = headersFromTerraform(v)
 		}
+		if err != nil {
+			return nil, errors.Wrapf(err, "cannot convert %s", k)
+		}
+		params[k] = v
 	}
 	return params, nil
+}
+
+// headersToTerraform encodes a headers map as the JSON string Terraform
+// expects; any other value is returned as is.
+func headersToTerraform(v any) (any, error) {
+	m, ok := v.(map[string]any)
+	if !ok {
+		return v, nil
+	}
+	if err := encodeHappRouting(m); err != nil {
+		return nil, err
+	}
+	return canonicalJSON(m)
+}
+
+// headersFromTerraform decodes the JSON string from the Terraform state into
+// a headers map; any other value is returned as is.
+func headersFromTerraform(v any) (any, error) {
+	s, ok := v.(string)
+	if !ok {
+		return v, nil
+	}
+	m := map[string]any{}
+	if s != "" {
+		if err := json.Unmarshal([]byte(s), &m); err != nil {
+			return nil, err
+		}
+	}
+	decodeHappRouting(m)
+	return m, nil
 }
 
 // canonicalJSON encodes m with sorted keys, no extra whitespace and no HTML
