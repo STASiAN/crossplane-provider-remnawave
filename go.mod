@@ -12,6 +12,8 @@ require (
 	github.com/crossplane/crossplane-tools v0.0.0-20260715161912-60e57f817ad1
 	github.com/crossplane/crossplane/apis/v2 v2.3.3
 	github.com/crossplane/upjet/v2 v2.4.1-0.20260728103920-4f6e6e10dff2
+	github.com/hashicorp/terraform-plugin-framework v1.19.0
+	github.com/hashicorp/terraform-plugin-go v0.31.0
 	github.com/pkg/errors v0.9.1
 	google.golang.org/grpc v1.83.2
 	k8s.io/api v0.35.3
@@ -74,9 +76,7 @@ require (
 	github.com/hashicorp/hcl/v2 v2.24.0 // indirect
 	github.com/hashicorp/logutils v1.0.0 // indirect
 	github.com/hashicorp/terraform-json v0.27.2 // indirect
-	github.com/hashicorp/terraform-plugin-framework v1.19.0 // indirect
 	github.com/hashicorp/terraform-plugin-framework-validators v0.19.0 // indirect
-	github.com/hashicorp/terraform-plugin-go v0.31.0 // indirect
 	github.com/hashicorp/terraform-plugin-log v0.11.0 // indirect
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.40.0 // indirect
 	github.com/hashicorp/terraform-registry-address v0.4.0 // indirect

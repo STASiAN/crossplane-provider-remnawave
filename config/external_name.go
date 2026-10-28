@@ -1,7 +1,11 @@
 package config
 
 import (
+	"context"
+
 	"github.com/crossplane/upjet/v2/pkg/config"
+	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-go/tftypes"
 )
 
 // uuidAsIdentifier is IdentifierFromProvider for resources whose Terraform
@@ -26,6 +30,29 @@ var uuidAsIdentifier = func() config.ExternalName {
 	}
 	return e
 }()
+
+// uuidStateEmpty reports a state without `uuid` as empty. Before the first
+// create, upjet rebuilds the prior state from the parameters, which is not
+// null; without a `uuid` the provider cannot find the resource, so the state
+// must not count as an existing resource.
+func uuidStateEmpty(_ context.Context, state tftypes.Value, _ rschema.Schema) (bool, error) {
+	if state.IsNull() || !state.IsKnown() {
+		return true, nil
+	}
+	var attrs map[string]tftypes.Value
+	if err := state.As(&attrs); err != nil {
+		return false, err
+	}
+	uuid, ok := attrs["uuid"]
+	if !ok || uuid.IsNull() || !uuid.IsKnown() {
+		return true, nil
+	}
+	var s string
+	if err := uuid.As(&s); err != nil {
+		return false, err
+	}
+	return s == "", nil
+}
 
 // ExternalNameConfigs contains all external name configurations for this
 // provider. Remnawave assigns identifiers (UUIDs) server-side, so every
@@ -63,6 +90,11 @@ func ExternalNameConfigurations() config.ResourceOption {
 	return func(r *config.Resource) {
 		if e, ok := ExternalNameConfigs[r.Name]; ok {
 			r.ExternalName = e
+			for _, a := range e.TFPluginFrameworkOptions.ComputedIdentifierAttributes {
+				if a == "uuid" {
+					r.TerraformPluginFrameworkIsStateEmptyFn = uuidStateEmpty
+				}
+			}
 		}
 	}
 }
