@@ -7,7 +7,7 @@ tool golang.org/x/tools/cmd/goimports
 require (
 	dario.cat/mergo v1.0.2
 	github.com/alecthomas/kingpin/v2 v2.4.0
-	github.com/batonogov/terraform-provider-remnawave v1.13.0
+	github.com/batonogov/terraform-provider-remnawave v1.13.1
 	github.com/crossplane/crossplane-runtime/v2 v2.3.3
 	github.com/crossplane/crossplane-tools v0.0.0-20260715161912-60e57f817ad1
 	github.com/crossplane/crossplane/apis/v2 v2.3.3

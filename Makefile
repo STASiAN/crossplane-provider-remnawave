@@ -12,10 +12,10 @@ TERRAFORM_VERSION_VALID := $(shell [ "$(TERRAFORM_VERSION)" = "`printf "$(TERRAF
 
 export TERRAFORM_PROVIDER_SOURCE ?= batonogov/remnawave
 export TERRAFORM_PROVIDER_REPO ?= https://github.com/batonogov/terraform-provider-remnawave
-export TERRAFORM_PROVIDER_VERSION ?= 1.13.0
+export TERRAFORM_PROVIDER_VERSION ?= 1.13.1
 export TERRAFORM_PROVIDER_DOWNLOAD_NAME ?= terraform-provider-remnawave
 export TERRAFORM_PROVIDER_DOWNLOAD_URL_PREFIX ?= https://github.com/batonogov/terraform-provider-remnawave/releases/download/v$(TERRAFORM_PROVIDER_VERSION)
-export TERRAFORM_NATIVE_PROVIDER_BINARY ?= terraform-provider-remnawave_v1.13.0
+export TERRAFORM_NATIVE_PROVIDER_BINARY ?= terraform-provider-remnawave_v1.13.1
 export TERRAFORM_DOCS_PATH ?= docs/resources
 
 
